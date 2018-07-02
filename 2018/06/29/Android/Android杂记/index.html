@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Android一些琐碎的笔记和心得。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 杂记">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Android杂记/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="Android一些琐碎的笔记和心得。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T08:32:34.006Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 杂记">
+<meta name="twitter:description" content="Android一些琐碎的笔记和心得。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Android杂记/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android 杂记 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Android杂记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 杂记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 16:32:34" itemprop="dateModified" datetime="2018-07-02T16:32:34+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">Android一些琐碎的笔记和心得。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Device-Compatibility"><a href="#Device-Compatibility" class="headerlink" title="Device Compatibility"></a>Device Compatibility</h2><ol>
+<li><p><strong>Device features</strong></p>
+<ul>
+<li><p>declare necessary features</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-feature</span> <span class="attr">android:name</span>=<span class="string">"android.hardware.sensor.compass"</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:required</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>check for the device feature at runtime</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PackageManager pm = getPackageManager();</span><br><span class="line"><span class="keyword">if</span> (!pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_COMPASS)) &#123;</span><br><span class="line">    <span class="comment">// This device does not have a compass, turn off the compass feature</span></span><br><span class="line">    disableCompassFeature();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Some system <strong>permissions</strong> implicitly require the availability of a device feature. For example, if your app requests permission to access to BLUETOOTH, this implicitly requires the <code>FEATURE_BLUETOOTH</code> device feature. You can disable filtering based on this feature and make your app available to devices without Bluetooth by setting the required attribute to “false” in the <code>&lt;uses-feature&gt;</code> tag. </p>
+</li>
+</ul>
+</li>
+<li><p><strong>Platform version</strong></p>
+<ul>
+<li><p>declare the minimum version with which your app is compatible and the highest version on which you’ve optimized your app</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-sdk</span> <span class="attr">android:minSdkVersion</span>=<span class="string">"14"</span> <span class="attr">android:targetSdkVersion</span>=<span class="string">"19"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>check the API level at runtime</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.HONEYCOMB) &#123;</span><br><span class="line">    <span class="comment">// Running on something older than API level 11, so disable</span></span><br><span class="line">    <span class="comment">// the drag/drop features that use ClipboardManager APIs</span></span><br><span class="line">    disableDragAndDrop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>Screen configuration</strong></p>
+<ul>
+<li>screen size: small, normal, large, and xlarge</li>
+<li>densities: mdpi (medium), hdpi (hdpi), xhdpi (extra high), xxhdpi (extra-extra high), and others</li>
+</ul>
+</li>
+<li><p>总结</p>
+<ul>
+<li>There are two types of compatibility: <em>device compatibility</em> and <em>app compatibility</em>.</li>
+<li>AndroidManifest.xml 文件中声明“要求”的标签的名字都是“uses-XXX”</li>
+</ul>
+</li>
+</ol>
+<h2 id="Intent"><a href="#Intent" class="headerlink" title="Intent"></a><strong>Intent</strong></h2><h3 id="Intent-1"><a href="#Intent-1" class="headerlink" title="Intent"></a>Intent</h3><ul>
+<li><p>Intent 的常用<strong>Action</strong>定义在Intent的类里，以及Android 框架的其他类里，比如<a href="https://developer.android.com/reference/android/provider/Settings.html" target="_blank" rel="noopener">Settings</a>，用于打开设置界面。自定义的Intent Action一般以包名作为前缀，并以大写后缀部分，如<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- **Data**是一个Uri。Intent的```setData()```和```setType()```会互相置空对方，因此当需要设置两者的时候，使用```setDataAndType()```方法。</span><br><span class="line"></span><br><span class="line">- **category** 提供了一些额外的信息。对用于启动Activity的隐式Intent，系统在解析其可接收的组件时，会假定该Intent携带```CATEGORY_DEFAULT```的category（但系统**不会**自动在Intent中添加这个category）。因此，对于支持隐式Intent启动的Activity，必须在Intent Filter中添加```CATEGORY_DEFAULT```。可以认为```CATEGORY_DEFAULT```将一个Activity标志为可被隐式启动的。</span><br><span class="line"></span><br><span class="line">- 像Action一样，Intent也定义了很多标准[**Extra**常量](https://developer.android.com/reference/android/content/Intent.html#EXTRA_ALARM_COUNT)。</span><br><span class="line"></span><br><span class="line">- 由于设备上不一定有能响应隐式Intent的app，使用隐式Intent启动Activity时，应先进行检查。</span><br><span class="line">    ```java</span><br><span class="line">    if (sendIntent.resolveActivity(getPackageManager()) != null) &#123;</span><br><span class="line">        startActivity(sendIntent);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>当响应隐式Intent的Activity有多个时，系统会弹出选择界面供用户选择，并且有选项可供用户将某个Activity设置为默认Activity，下次响应该Intent类型时，将直接启动默认Activity。App也可如下强制每次都调起选择界面。</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Intent sendIntent = <span class="keyword">new</span> Intent(Intent.ACTION_SEND);</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment">// This says something like "Share this photo with"</span></span><br><span class="line">String title = getResources().getString(R.string.chooser_title);</span><br><span class="line"><span class="comment">// Create intent to show the chooser dialog</span></span><br><span class="line">Intent chooser = Intent.createChooser(sendIntent, title);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Verify the original intent will resolve to at least one activity</span></span><br><span class="line"><span class="keyword">if</span> (sendIntent.resolveActivity(getPackageManager()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">    startActivity(chooser);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://developer.android.com/guide/components/intents-common.html" target="_blank" rel="noopener">常用Intent</a></p>
+</li>
+</ul>
+<h3 id="Intent-Filter"><a href="#Intent-Filter" class="headerlink" title="Intent Filter"></a>Intent Filter</h3><ul>
+<li>Intent Filter<ul>
+<li>只对隐式Intent起作用。</li>
+<li>一个组件可以声明多个Intent Filter。隐式Intent在解析时，只要能通过组件任意一个Filter，该组件即可响应该Intent。</li>
+<li>组件在声明Intent Filter时，应该将不同的功能分成不同的Filter。</li>
+<li><a href="https://developer.android.com/guide/topics/manifest/data-element.html" target="_blank" rel="noopener"><strong>data</strong></a> 包含两部分，mime type和URI结构。</li>
+</ul>
+</li>
+<li><a href="https://developer.android.com/guide/components/intents-filters.html#Resolution" target="_blank" rel="noopener">Intent 解析</a><ol>
+<li>Intent Filter的作用是声明了一个组件可以处理的Intent信息，比如Action、Category和数据类型、数据URI结构。</li>
+<li>隐式Intent携带了希望执行的Action，该Intent所属的Category，以及包含的数据及其类型。</li>
+<li>综上，一个Intent命中一个组件的条件是，该Intent符合该组件的任意一个Intent Filter的声明，即该Intent携带的信息被<strong>全部包含</strong>在一个Intent Filter的声明中。</li>
+</ol>
+</li>
+<li><p>匹配Intent不仅可以用来寻找响应的组件，也可以用来查询设备上有哪些组件可以匹配指定的Intent。<a href="https://developer.android.com/reference/android/content/pm/PackageManager.html" target="_blank" rel="noopener">PackageManager</a>提供了一些<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## Task and back stack</span><br><span class="line"></span><br><span class="line">- ```Intent Flag</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>使用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">    - 使用```FLAG_ACTIVITY_CLEAR_TOP```调起已经存在于某个task中的Activity时，会清空该task中位于目标Activity之上的其他Activity。常与```FLAG_ACTIVITY_NEW_TASK```配合使用。</span><br><span class="line">- ```Launch Mode```  </span><br><span class="line">    - 对于launchMode为```standard```的Activity，不管用于调起它们的Intent设置了怎样的flag，每次被调起，都会创建新的实例。</span><br><span class="line">- ```Document``` </span><br><span class="line">    - ```FLAG_ACTIVITY_NEW_DOCUMENT```和```documentLaunchMode```的```intoExist```与```always```属性值仅对launchMode为```standard```的Activity起作用。</span><br><span class="line">- Activity的调起结果，由以下三个元素决定：</span><br><span class="line">    - Intent的```Flag</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>Activity的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">    - Activity的```documentLaunchMode```  </span><br><span class="line">- 这三个元素共同确定了以下维度的结果：  </span><br><span class="line">    1. 是否在已存在的task中查找目标Activity</span><br><span class="line">    2. 当满足1，查找task的范围（仅当前task还是所有task）</span><br><span class="line">    3. 当满足1，且在已存在的task中找到目标Activity，如何处理该task中的其他Activity。</span><br><span class="line">    4. 是否创建新实例（onCreate还是onNewIntent）。与1不是互斥关系，查找目标Activity不意味着不创建新实例。</span><br><span class="line">    5. 若需要创建新实例，新实例创建的task。推论（未证实）：与1有关联，若需要查找task，则新实例将被创建于目标task，不然查找task来干嘛？仅仅是用来销毁？</span><br><span class="line">    6. 当目标Activity结束时，是否在```Recents Screen```中留下入口。</span><br><span class="line"></span><br><span class="line">## Fragment</span><br><span class="line"></span><br><span class="line">- 每个Fragment都需要一个id或者tag来唯一标识。</span><br><span class="line"></span><br><span class="line">- Fragment 的backStack维护的是transaction，而不是Fragment。</span><br><span class="line">    &gt; The order in which you add changes to a FragmentTransaction doesn&apos;t matter, except:  </span><br><span class="line">    &gt;</span><br><span class="line">    &gt; You must call `commit()` last.  </span><br><span class="line">    &gt;</span><br><span class="line">    &gt; If you&apos;re adding multiple fragments to the same container, then the order in which you add them determines the order they appear in the view hierarchy.</span><br><span class="line"></span><br><span class="line">    &gt; If you do not call `addToBackStack()` when you perform a transaction that removes a fragment, then that fragment is destroyed when the transaction is committed and the user cannot navigate back to it. Whereas, if you do call `addToBackStack()` when removing a fragment, then the fragment is stopped and will be resumed if the user navigates back.</span><br><span class="line"></span><br><span class="line">- 提交与执行```FragmentTraction</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><figure class="highlight plain"><figcaption><span>事务被提交，但不会马上执行，而是被异步执行。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">    - ```commitNow()``` 事务被提交并同步执行。在此方法返回前，事务中添加或去除Fragment等操作已被执行。</span><br><span class="line">    - ```commitAllowingStateLoss()```允许在Activity保存状态之后提交事务。</span><br><span class="line">    - ```executePendingTransactions()``` 马上**同步**执行所有提交但未执行的事务。</span><br><span class="line">    &gt; 批注：在FragmentManager中，维护一个事务的队列，使用```Handler.post()```来异步执行事务。```FragmentTransaction.commit()```方法实际是向FragmentManager入列一个事务。而```commitNow()```方法则是调用FragmentManager同步执行一个事务。</span><br><span class="line"></span><br><span class="line">- Fragment的生命周期受Activity影响，但并不一定是对应关系。特别是对于动态添加的Fragment，比如在Activity的resumed状态下添加Fragment，Fragment的生命周期是“一次性”走到```onResume()```的.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## LayoutInflater</span><br><span class="line"></span><br><span class="line">- `LayoutInflater`的多个`inflate()`重载方法，最终都是调用`inflate(XmlPullParser parser, @Nullable ViewGroup root, boolean attachToRoot)`版本，该方法会根据XML布局文件的解析结果`parser`创建`View`树，并返回根`View`。</span><br><span class="line"></span><br><span class="line">- `createViewFromTag()`顾名思义，该方法会根据`parser`解析出来的标签名和属性等信息，创建**一个**`View`。在实现中，会先尝试调用`Factory2`和`Factory`的`onCreateView()`来创建`View`，如果返回`null`，再调用自身的`onCreateView()`。</span><br><span class="line"></span><br><span class="line">  ```java</span><br><span class="line">  public interface Factory &#123;</span><br><span class="line">      /**</span><br><span class="line">       * Hook you can supply that is called when inflating from a LayoutInflater.</span><br><span class="line">       * You can use this to customize the tag names available in your XML</span><br><span class="line">       * layout files.</span><br><span class="line">       *</span><br><span class="line">       * &lt;p&gt;</span><br><span class="line">       * Note that it is good practice to prefix these custom names with your</span><br><span class="line">       * package (i.e., com.coolcompany.apps) to avoid conflicts with system</span><br><span class="line">       * names.</span><br><span class="line">       *</span><br><span class="line">       * @param name Tag name to be inflated.</span><br><span class="line">       * @param context The context the view is being created in.</span><br><span class="line">       * @param attrs Inflation attributes as specified in XML file.</span><br><span class="line">       *</span><br><span class="line">       * @return View Newly created view. Return null for the default</span><br><span class="line">       *         behavior.</span><br><span class="line">       */</span><br><span class="line">      public View onCreateView(String name, Context context, AttributeSet attrs);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public interface Factory2 extends Factory &#123;</span><br><span class="line">      /**</span><br><span class="line">       * Version of &#123;@link #onCreateView(String, Context, AttributeSet)&#125;</span><br><span class="line">       * that also supplies the parent that the view created view will be</span><br><span class="line">       * placed in.</span><br><span class="line">       *</span><br><span class="line">       * @param parent The parent that the created view will be placed</span><br><span class="line">       * in; &lt;em&gt;note that this may be null&lt;/em&gt;.</span><br><span class="line">       * @param name Tag name to be inflated.</span><br><span class="line">       * @param context The context the view is being created in.</span><br><span class="line">       * @param attrs Inflation attributes as specified in XML file.</span><br><span class="line">       *</span><br><span class="line">       * @return View Newly created view. Return null for the default</span><br><span class="line">       *         behavior.</span><br><span class="line">       */</span><br><span class="line">      public View onCreateView(View parent, String name, Context context, AttributeSet attrs);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>从这两个接口的注释可以看出，它们可以作为“Hook”，用来自定义创建<code>View</code>的行为。<code>AppCompat</code>这些支持库就是利用它在加载布局时，识别XML布局文件中的<code>TextView</code>等标签，并创建对应的<code>AppCompatTextView</code>等。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/Android 资源/资源加载/" rel="next" title="Android 资源加载">
+                <i class="fa fa-chevron-left"></i> Android 资源加载
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Android 优化/性能优化工具篇/" rel="prev" title="Android性能优化工具篇">
+                Android性能优化工具篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wb.email@foxmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Device-Compatibility"><span class="nav-number">1.</span> <span class="nav-text">Device Compatibility</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Intent"><span class="nav-number">2.</span> <span class="nav-text">Intent</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Intent-1"><span class="nav-number">2.1.</span> <span class="nav-text">Intent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Intent-Filter"><span class="nav-number">2.2.</span> <span class="nav-text">Intent Filter</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

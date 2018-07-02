@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Handler消息处理机制解析。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Handler消息处理机制">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Handler消息处理机制/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="Handler消息处理机制解析。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T05:16:26.390Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Handler消息处理机制">
+<meta name="twitter:description" content="Handler消息处理机制解析。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Handler消息处理机制/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Handler消息处理机制 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Handler消息处理机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Handler消息处理机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 13:16:26" itemprop="dateModified" datetime="2018-07-02T13:16:26+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">Handler消息处理机制解析。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="消息处理机制"><a href="#消息处理机制" class="headerlink" title="消息处理机制"></a>消息处理机制</h1><h2 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h2><p>Android是响应式的操作系统，系统需要对用户的触摸操作、时间的变化、光线的变化等事件做出<strong><em>及时</em></strong>响应，比如响应点击、激活闹钟、自动调节屏幕亮度等。这符合生产者与消费者模型。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>满足这个需求，至少需要解决以下两个问题：</p>
+<ol>
+<li>生产者生产的消息能被<strong>加入消息队列</strong>进行处理。并且，消息往往需要指定其被处理的时间。</li>
+<li>消费者要能<strong>及时处理消息</strong>。多线程（多进程也同理，但不在本文讨论范围内）是解决此问题的一种方式，也是Android系统采用的方式。</li>
+</ol>
+<h3 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h3><p>Handler 消息处理机制为了解决这两个问题，提供了以下两个功能：</p>
+<ol>
+<li>能在指定时间处理消息。以下简称<strong><em>功能A</em></strong>。</li>
+<li>能将消息发送到指定线程处理。以下简称<strong><em>功能B</em></strong>。</li>
+</ol>
+<blockquote>
+<p>There are two main uses for a Handler: (1) to schedule messages and runnables to be executed as some point in the future; and (2) to enqueue an action to be performed on a different thread than your own.</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><p>在Handler消息机制中，有以下四个角色：</p>
+<ol>
+<li><code>Message</code>是消息，或者称为事件。</li>
+<li><code>MessageQueue</code>是消息队列。</li>
+<li><code>Handler</code>提供了将消息入列的方法，充当生产者的角色。</li>
+<li><code>Looper</code>会从消息队列中提取消息，充当消费者的角色。实际上<code>Looper</code>提取消息后，是调用<code>Message.target.dispatchMessage(Message msg)</code>来处理消息，而这里的<code>target</code>就是<code>Handler</code>类型，所以从这个角度来看，<code>Handler</code>不仅是生产者，也是真正的消费者。</li>
+</ol>
+<h3 id="功能实现"><a href="#功能实现" class="headerlink" title="功能实现"></a>功能实现</h3><h4 id="功能A"><a href="#功能A" class="headerlink" title="功能A"></a>功能A</h4><p>功能A的实现需要<code>Message</code>、<code>MessageQueue</code>、<code>Handler</code>三者的配合。</p>
+<h5 id="生产消息"><a href="#生产消息" class="headerlink" title="生产消息"></a>生产消息</h5><p><code>Handler</code>提供了一系列<code>send</code>和<code>post</code>方法来发送消息，并指定消息的处理时机。这些方法最终都会调用<code>enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis)</code>，该方法做了以下两件事：</p>
+<ol>
+<li><p>将<code>Message.target</code>指向<code>Handler</code>自身。此操作将消息与处理者绑定在一起。</p>
+</li>
+<li><p>调用<code>MessageQueue.enqueueMessage(Message msg, long when)</code>来将消息入列。这里<code>when</code>参数正是消息的处理时间。</p>
+<blockquote>
+<p><code>Handler.sendMessageAtFrontOfQueue(Message msg)</code>方法将<code>when</code>赋值为0。</p>
+</blockquote>
+<blockquote>
+<p>The time-base is <code>android.os.SystemClock.uptimeMillis()</code>.</p>
+</blockquote>
+</li>
+</ol>
+<h5 id="消息入列"><a href="#消息入列" class="headerlink" title="消息入列"></a>消息入列</h5><p>实际上，Handler消息处理机制并未提供在<strong>准确</strong>的时间处理消息的机制。而是折衷地采取了以下方案：</p>
+<ul>
+<li>在消息入列时，根据<code>Message.when</code>将消息插入到队列中合适的位置，使得队列中的消息总是<strong>按照处理时间排序</strong>的。</li>
+<li>在消费消息时，总是从<strong>队列头部</strong>提取消息，并检查是否还未到达消息的处理时间，若是则不消费消息继续等待；否则消费消息。</li>
+</ul>
+<p>因此实际效果是<strong>不早于</strong>消息指定的时间来处理消息。并且，已经入列的消息的执行顺序在入列的时候就已经确定了，消费消息的时候不会改变顺序。</p>
+<p><code>MessageQueue</code>采用<strong>链表</strong>来存储消息，<code>enqueueMessage(Message msg, long when)</code>的实现中会根据<code>Message.when</code>将消息插入到链表中的正确位置。</p>
+<h4 id="功能B"><a href="#功能B" class="headerlink" title="功能B"></a>功能B</h4><p>功能B的实现依赖于<code>Looper</code>，<code>MessageQueue</code>和<code>Handler</code>的配合。</p>
+<ul>
+<li>每个线程可以绑定<strong>不超过</strong>一对<code>Looper</code>和<code>MessageQueue</code>（可以没有，那就是常规的Java线程，不具备Handler消息处理机制）。</li>
+<li>每个<code>Handler</code>也持有<strong>一对</strong><code>Looper</code>和<code>MessageQueue</code>，一旦<code>Handler</code>实例被构造，只能用于向其持有的队列添加消息。</li>
+<li>在线程中启动绑定的<code>Looper</code>，在队列中监听并处理消息。</li>
+</ul>
+<h5 id="创建线程独立的消息队列"><a href="#创建线程独立的消息队列" class="headerlink" title="创建线程独立的消息队列"></a>创建线程独立的消息队列</h5><p>让一个线程具备消息处理机制，需要完成两件事：</p>
+<ol>
+<li><p>创建<code>Looper</code>和<code>MessageQueue</code>。</p>
+<p>在线程中调用<strong>静态</strong>方法<code>Looper.prepare()</code>，该方法会创建一个<code>Looper</code>对象，该<code>Looper</code>创建一个<code>MessageQueue</code>并持有它（<code>Looper</code>也会持有当前<code>Thread</code>对象）。</p>
+<blockquote>
+<p>Android使用<code>ThreadLocal</code>来保证一个线程不能绑定超过一个<code>Looper</code>。</p>
+</blockquote>
+</li>
+<li><p>在绑定的线程中调用<code>Looper</code>的静态方法<code>loop()</code>让<code>Looper</code>开始监听消息。<code>loop()</code>方法会无限循环调用<code>MessageQueue.next()</code>方法来将消息出列并处理。</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Run the message queue in this thread. Be sure to call</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> #quit()&#125; to end the loop.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Looper me = myLooper();</span><br><span class="line">    <span class="keyword">if</span> (me == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No Looper; Looper.prepare() wasn't called on this thread."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> MessageQueue queue = me.mQueue;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        Message msg = queue.next(); <span class="comment">// might block</span></span><br><span class="line">        <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// No message indicates that the message queue is quitting.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            msg.target.dispatchMessage(msg);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        msg.recycleUnchecked();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 注意：由于<code>loop()</code>方法是一个死循环，调用<code>loop()</code>之后的语句在其跳出循环之前不会被执行。这也是为什么经常看到以下写法。</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * This is a typical example of the implementation of a Looper thread,</span></span><br><span class="line"><span class="comment">  * using the separation of &#123;<span class="doctag">@link</span> #prepare&#125; and &#123;<span class="doctag">@link</span> #loop&#125; to create an</span></span><br><span class="line"><span class="comment">  * initial Handler to communicate with the Looper.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LooperThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> Handler mHandler;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Looper.prepare();</span><br><span class="line">        mHandler = <span class="keyword">new</span> Handler() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// process incoming messages here</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        Looper.loop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h5 id="消息出列"><a href="#消息出列" class="headerlink" title="消息出列"></a>消息出列</h5><p><code>MessageQueue.next()</code>方法会返回下一个<strong>达到执行时间</strong>的消息。实现这个需求有以下方案：</p>
+<ol>
+<li>无限循环访问消息队列对其进行监听，并判断队头是否有到时间的消息。缺点是显而易见的，该线程将始终处于忙碌状态，造成对CPU等资源的浪费。</li>
+<li>挂起线程，直到有可处理的消息。<code>sleep()</code>和<code>wait()</code>都能实现挂起线程。关键在于线程需要在以下两种情况苏醒或被唤醒：<ul>
+<li>到达队头消息处理时间。<code>sleep()</code>和<code>wait()</code>都可以传参设置挂起的时长，做到主动苏醒。</li>
+<li>有新的消息被加入到队列头部，而且该消息已到达可被处理的时间。只有<code>wait()</code>可以做到被<code>notify()</code>唤醒。</li>
+</ul>
+</li>
+</ol>
+<p>在<code>MessageQueue.next()</code>中，通过调用native 方法<code>nativePollOnce(long ptr, int timeoutMillis)</code>来完成挂起线程指定时长，与<code>wait()</code>作用相同。<code>MessageQueue.enqueueMessage(Message msg, long when)</code>将消息入列时，如果是加到队头，会调用native 方法<code>nativeWake(long ptr)</code>来唤醒线程，被唤醒的线程会去检查队列中是否有可被处理的消息，否则重新挂起。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Message <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Return here if the message loop has already quit and been disposed.</span></span><br><span class="line">    <span class="comment">// This can happen if the application tries to restart a looper after quit</span></span><br><span class="line">    <span class="comment">// which is not supported.</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> ptr = mPtr;</span><br><span class="line">    <span class="keyword">if</span> (ptr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="keyword">int</span> nextPollTimeoutMillis = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="comment">//将线程挂起</span></span><br><span class="line">        nativePollOnce(ptr, nextPollTimeoutMillis);</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">            <span class="comment">// Try to retrieve the next message.  Return if found.</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">long</span> now = SystemClock.uptimeMillis();</span><br><span class="line">            Message prevMsg = <span class="keyword">null</span>;</span><br><span class="line">            Message msg = mMessages;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">            <span class="keyword">if</span> (msg != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (now &lt; msg.when) &#123;</span><br><span class="line">                    <span class="comment">// Next message is not ready.  Set a timeout to wake up when it is ready.</span></span><br><span class="line">                    nextPollTimeoutMillis = (<span class="keyword">int</span>) Math.min(msg.when - now, Integer.MAX_VALUE);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// Got a message.</span></span><br><span class="line">                    mBlocked = <span class="keyword">false</span>;</span><br><span class="line">                    <span class="keyword">if</span> (prevMsg != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        prevMsg.next = msg.next;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        mMessages = msg.next;</span><br><span class="line">                    &#125;</span><br><span class="line">                    msg.next = <span class="keyword">null</span>;</span><br><span class="line">                    msg.markInUse();</span><br><span class="line">                    <span class="keyword">return</span> msg;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// No more messages.</span></span><br><span class="line">                nextPollTimeoutMillis = -<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Process the quit message now that all pending messages have been handled.</span></span><br><span class="line">            <span class="keyword">if</span> (mQuitting) &#123;</span><br><span class="line">                dispose();</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h3><ul>
+<li><p>为什么<code>Looper</code>与线程是一对一的关系，而与<code>Handler</code>是一对多的关系？</p>
+<p>作为消息发送工具，<code>Handler</code>只需一个即可。但是<code>Handler</code>同时还具有消费者的身份，这使其可处理具体的业务（通过复写其<code>void handleMessage(Message msg)</code>方法），因此为不同的业务分配不同的<code>Handler</code>有了充分的理由。</p>
+</li>
+<li><p>为什么消息只会被对应的<code>Handler</code>处理？</p>
+<p>因为<code>Message.target</code>指定了对应的<code>Handler</code>。</p>
+</li>
+<li><p><code>Handler</code>如何实现删除消息时，只删除由其加入队列的消息？</p>
+<p>实际上，<code>Handler</code>并不负责删除消息的细节，它会调用<code>MessageQueue</code>的<code>remove</code>方法来删除消息，并将自身作为参数传递给<code>remove</code>方法。<code>MessageQueue</code>会遍历链表，删除满足条件的消息。其中一个条件就是<code>Message.target</code>为参数中<code>Handler</code>。</p>
+</li>
+<li><p>为什么使用Handler不用加锁？</p>
+<p>因为真正执行消息入列的<code>MessageQueue</code>被加了锁。</p>
+</li>
+<li><p>开发者无需对<code>Message</code>调用<code>recycle()</code>方法，因为<code>Looper</code>每处理完一个<code>Message</code>，都会调用<code>Message.recycleUnchecked()</code>来回收。</p>
+</li>
+<li><p>主线程调用<code>Looper.loop()</code>，并且当其队列为空被挂起之后，主线程如何被唤醒？</p>
+<ul>
+<li><p>主线程并不是唯一的线程，还有Binder线程等其他线程存在，这些线程可向主线程的队列添加消息。</p>
+</li>
+<li><p>调试发现，<code>nativePollOnce(long ptr, int timeoutMillis)</code>这个本地方法的作用不只是简单地挂起线程。在主线程的队列为空调用这个方法被阻塞之后，点击一下屏幕，发现主线程的调用栈如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">at android.view.InputEventReceiver.dispatchInputEvent(InputEventReceiver.java:185)</span><br><span class="line">at android.os.MessageQueue.nativePollOnce(MessageQueue.java:-1)</span><br><span class="line">at android.os.MessageQueue.next(MessageQueue.java:325)</span><br><span class="line">at android.os.Looper.loop(Looper.java:142)</span><br><span class="line">at android.app.ActivityThread.main(ActivityThread.java:6541)</span><br><span class="line">at java.lang.reflect.Method.invoke(Method.java:-1)</span><br><span class="line">at com.android.internal.os.Zygote$MethodAndArgsCaller.run(Zygote.java:240)</span><br><span class="line">at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:767)</span><br></pre></td></tr></table></figure>
+<p>在<code>nativePollOnce(long ptr, int timeoutMillis)</code>里调用了<code>InputEventReceiver.dispatchInputEvent(InputEventReceiver.java:185)</code>，看源码可以发现该方法有如下注释，这是一个被native 代码调用的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Called from native code.</span></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dispatchInputEvent</span><span class="params">(<span class="keyword">int</span> seq, InputEvent event)</span></span></span><br></pre></td></tr></table></figure>
+<p>由此可推测，调用<code>nativePollOnce()</code>方法挂起主线程之后，当有一些事件到来时，native层会唤醒主线程。具体的阻塞和唤醒机制，就是epoll 机制了。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="附加题"><a href="#附加题" class="headerlink" title="附加题"></a>附加题</h3><h4 id="ThreadLocal"><a href="#ThreadLocal" class="headerlink" title="ThreadLocal"></a>ThreadLocal</h4><p>这个类的实例可以用来存储或获取<strong>一个</strong>与线程相关的变量。在不同的线程调用同一个对象的<code>TheadLocal.set()</code>和<code>ThreadLocal.get()</code>可以设置和访问<strong>对应线程</strong>的变量。原理上是隐藏了对<code>Thread.currentThread()</code>的调用，变量实际上是被<code>Thread</code>对象持有的。</p>
+<h4 id="Synchronization-barrier-amp-Asynchronous-message"><a href="#Synchronization-barrier-amp-Asynchronous-message" class="headerlink" title="Synchronization barrier &amp; Asynchronous message"></a>Synchronization barrier &amp; Asynchronous message</h4><blockquote>
+<p>Sets whether the message is asynchronous, meaning that it is not subject to {@link Looper} synchronization barriers.<br>Certain operations, such as view invalidation, may introduce synchronization barriers into the {@link Looper}’s message queue to <em>prevent <strong>subsequent messages</strong> from being delivered <strong>until some condition is met</strong></em>.  In the case of view invalidation, messages which are posted after a call to {@link android.view.View#invalidate} are suspended by means of a synchronization barrier until the next frame is ready to be drawn.  The synchronization barrier ensures that the invalidation request is completely handled before resuming.<br>Asynchronous messages are exempt from synchronization barriers. They typically represent <strong>interrupts</strong>, <strong>input events</strong>, and other signals that must be handled independently even while other work has been suspended.<br>Note that asynchronous messages may be delivered <strong>out of order with respect to synchronous messages</strong> although they are always delivered <strong>in order among themselves</strong>. If the relative order of these messages matters then they probably should not be asynchronous in the first place.  Use with caution.</p>
+</blockquote>
+<blockquote>
+<p>Message processing occurs as usual until the message queue encounters the synchronization barrier that has been posted.  When the barrier is encountered, later synchronous messages in the queue are stalled (prevented from being executed) until the barrier is released by calling {@link #removeSyncBarrier} and specifying the token that identifies the synchronization barrier.<br>This method is used to immediately postpone execution of all subsequently posted synchronous messages until a condition is met that releases the barrier. Asynchronous messages (see {@link Message#isAsynchronous} are exempt from the barrier and continue to be processed as usual.</p>
+</blockquote>
+<h5 id="同步消息屏障"><a href="#同步消息屏障" class="headerlink" title="同步消息屏障"></a>同步消息屏障</h5><p>消息队列中的消息会根据时间按序被处理，这些消息称为<strong>同步消息</strong>。有时需要延迟处理消息，直到达到某个条件。Synchronization Barrier（以下简称Sync Barrier），翻译为同步消息屏障或同步分隔栏等，提供了这样的功能。</p>
+<ul>
+<li>Sync Barrier的本质是一个<code>Message</code>，只是<code>target</code>为<code>null</code>，使用的时候，像普通消息一样，将其添加到消息队列即可。其作用是作为队列中一个的标志，标志着其<strong>后续的同步消息</strong>暂不被处理。其本身不需要被处理。</li>
+<li>Sync Barrier的入列规则与同步消息相同，会根据<code>Message.when</code>排序。</li>
+</ul>
+<blockquote>
+<p>系统对添加Sync Barriers 的方法<code>postSyncBarrier()</code>添加了{@Hide}注解，而<code>Handler</code>会为其发送的所有消息指定<code>target</code>，因此App 开发者无法采用常规方式添加同步消息屏障。</p>
+</blockquote>
+<h5 id="异步消息"><a href="#异步消息" class="headerlink" title="异步消息"></a>异步消息</h5><p>Sync Barriers会阻止同步消息的处理，对于一些不需要被Sync Barriers阻止的消息，比如输入事件，Android 引入了异步消息的概念，来避免受制于Sync Barriers，使其能被正常执行。</p>
+<ul>
+<li>异步消息也是<code>Message</code>，<code>Message.setAsynchronous(boolean async)</code>可消息设置一个消息是否为异步消息。</li>
+<li>异步消息的入列规则与同步消息相同，会根据<code>Message.when</code>排序。因此异步消息之间会按序被执行。并且，当不存在Sync Barrier时，异步消息与同步消息没有差别。</li>
+</ul>
+<h5 id="延迟处理消息"><a href="#延迟处理消息" class="headerlink" title="延迟处理消息"></a>延迟处理消息</h5><p><code>MessageQueue.next()</code>在提取下一个处理的消息时，分以下两种情况：</p>
+<ul>
+<li><p>如果队头是Sync Barrier，会遍历队列寻找第一个异步消息进行处理。</p>
+<blockquote>
+<p>Sync Barrier本身不会被该方法出列。需要调用<code>MessageQueue.removeSyncBarrier(int token)</code>才能将Sync Barrier移除。</p>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li>如果队头不是Sync Barrier，会处理队头消息。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Message prevMsg = <span class="keyword">null</span>;</span><br><span class="line">Message msg = mMessages;</span><br><span class="line"><span class="keyword">if</span> (msg != <span class="keyword">null</span> &amp;&amp; msg.target == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// Stalled by a barrier.  Find the next asynchronous message in the queue.</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        prevMsg = msg;</span><br><span class="line">        msg = msg.next;</span><br><span class="line">    &#125; <span class="keyword">while</span> (msg != <span class="keyword">null</span> &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 处理消息或者挂起线程...</span></span><br></pre></td></tr></table></figure>
+<h4 id="IdleHandler"><a href="#IdleHandler" class="headerlink" title="IdleHandler"></a>IdleHandler</h4><blockquote>
+<p>Callback interface for discovering when a thread is going to block waiting for more messages.</p>
+</blockquote>
+<p><code>MessageQueue.next()</code>如果没找到可以处理的消息，会遍历<code>MessageQueue.mIdleHandlers</code>调用<code>IdleHandler.queueIdle()</code>来执行一些”空闲“时处理的工作。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/Permissions/" rel="next" title="Android Permission">
+                <i class="fa fa-chevron-left"></i> Android Permission
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Android 资源/Resources杂记/" rel="prev" title="Android Resources 杂记">
+                Android Resources 杂记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wb.email@foxmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息处理机制"><span class="nav-number">1.</span> <span class="nav-text">消息处理机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求分析"><span class="nav-number">1.1.</span> <span class="nav-text">需求分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">1.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案"><span class="nav-number">1.1.2.</span> <span class="nav-text">方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">1.2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#角色"><span class="nav-number">1.2.1.</span> <span class="nav-text">角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#功能实现"><span class="nav-number">1.2.2.</span> <span class="nav-text">功能实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#功能A"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">功能A</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#生产消息"><span class="nav-number">1.2.2.1.1.</span> <span class="nav-text">生产消息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#消息入列"><span class="nav-number">1.2.2.1.2.</span> <span class="nav-text">消息入列</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#功能B"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">功能B</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#创建线程独立的消息队列"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">创建线程独立的消息队列</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#消息出列"><span class="nav-number">1.2.2.2.2.</span> <span class="nav-text">消息出列</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现细节"><span class="nav-number">1.2.3.</span> <span class="nav-text">实现细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附加题"><span class="nav-number">1.2.4.</span> <span class="nav-text">附加题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ThreadLocal"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">ThreadLocal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Synchronization-barrier-amp-Asynchronous-message"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">Synchronization barrier &amp; Asynchronous message</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#同步消息屏障"><span class="nav-number">1.2.4.2.1.</span> <span class="nav-text">同步消息屏障</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#异步消息"><span class="nav-number">1.2.4.2.2.</span> <span class="nav-text">异步消息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#延迟处理消息"><span class="nav-number">1.2.4.2.3.</span> <span class="nav-text">延迟处理消息</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IdleHandler"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">IdleHandler</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

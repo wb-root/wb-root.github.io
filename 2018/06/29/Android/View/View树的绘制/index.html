@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="View树的绘制流程，重绘请求流程，绘制模型及其他细节。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="View树的绘制">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/View/View树的绘制/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="View树的绘制流程，重绘请求流程，绘制模型及其他细节。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/View%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/View%E9%87%8D%E7%BB%98%E8%AF%B7%E6%B1%82.png">
+<meta property="og:updated_time" content="2018-07-02T07:38:29.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="View树的绘制">
+<meta name="twitter:description" content="View树的绘制流程，重绘请求流程，绘制模型及其他细节。">
+<meta name="twitter:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/View%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/View/View树的绘制/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>View树的绘制 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/View/View树的绘制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">View树的绘制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 15:38:29" itemprop="dateModified" datetime="2018-07-02T15:38:29+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">View树的绘制流程，重绘请求流程，绘制模型及其他细节。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="View树的绘制"><a href="#View树的绘制" class="headerlink" title="View树的绘制"></a>View树的绘制</h2><h3 id="自顶向下的绘制派发"><a href="#自顶向下的绘制派发" class="headerlink" title="自顶向下的绘制派发"></a>自顶向下的绘制派发</h3><p><code>View</code>树的绘制流程是由<code>ViewRootImpl</code>发起，从根<code>View</code>开始，向子<code>View</code>树派发绘制事件。</p>
+<p><code>View</code>有两个<code>draw()</code>重载方法：</p>
+<ul>
+<li><p><code>View</code>的软件绘制行为。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Manually render this view (and all of its children) to the given Canvas.</span></span><br><span class="line"><span class="comment"> * The view must have already done a full layout before this function is</span></span><br><span class="line"><span class="comment"> * called.  When implementing a view, implement</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> #onDraw(android.graphics.Canvas)&#125; instead of overriding this method.</span></span><br><span class="line"><span class="comment"> * If you do need to override this method, call the superclass version.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> canvas The Canvas to which the View is rendered.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@CallSuper</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(Canvas canvas)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由父<code>View</code>调用，会根据layer type 和硬件加速是否开启选择不同的绘制行为。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * This method is called by ViewGroup.drawChild() to have each child view draw itself.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This is where the View specializes rendering behavior based on layer type,</span></span><br><span class="line"><span class="comment"> * and hardware acceleration.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">draw</span><span class="params">(Canvas canvas, ViewGroup parent, <span class="keyword">long</span> drawingTime)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://pb88ntxoi.bkt.clouddn.com/image/android/View%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B.png" alt="View树的绘制流程"></p>
+<h3 id="重绘请求"><a href="#重绘请求" class="headerlink" title="重绘请求"></a>重绘请求</h3><h4 id="自底向上传递的invalidate-请求"><a href="#自底向上传递的invalidate-请求" class="headerlink" title="自底向上传递的invalidate 请求"></a>自底向上传递的invalidate 请求</h4><p><code>View.invalidate()</code>的系列重载方法，通过调用<code>ViewParent.invalidateChild()</code>向父<code>View</code>发起重绘请求，请求在<code>View</code>树中逐层往上传递，最后到达<code>ViewRootImpl</code>，由其触发新的绘制流程。</p>
+<p><img src="http://pb88ntxoi.bkt.clouddn.com/image/android/View%E9%87%8D%E7%BB%98%E8%AF%B7%E6%B1%82.png" alt="View重绘请求"></p>
+<h4 id="postInvalidate"><a href="#postInvalidate" class="headerlink" title="postInvalidate"></a>postInvalidate</h4><p>与<code>invalidate()</code>不同，<code>postInvalidate()</code><strong>并非</strong>自底向上地向父<code>View</code>发起请求，而是直接调用<code>attachInfo.mViewRootImpl.dispatchInvalidateDelayed()</code>，来发送一个消息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispatchInvalidateDelayed</span><span class="params">(View view, <span class="keyword">long</span> delayMilliseconds)</span> </span>&#123;</span><br><span class="line">    Message msg = mHandler.obtainMessage(MSG_INVALIDATE, view);</span><br><span class="line">    mHandler.sendMessageDelayed(msg, delayMilliseconds);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//...</span></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewRootHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">            <span class="keyword">case</span> MSG_INVALIDATE:</span><br><span class="line">                ((View) msg.obj).invalidate();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">                <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，该消息的处理，实际上是调用发起<code>postInvalidate()</code>方法的<code>View</code>的<code>invalidate()</code>方法，从而发起一个invalidate 重绘请求。</p>
+<blockquote>
+<p><code>postInvalidate()</code> can be invoked from outside of the UI thread only when this View is attached to a window.</p>
+</blockquote>
+<h4 id="典型场景"><a href="#典型场景" class="headerlink" title="典型场景"></a>典型场景</h4><p><code>View.setVisibility()</code>等方法正是通过<code>invalidate()</code>方法来发起重绘请求。</p>
+<h2 id="渲染"><a href="#渲染" class="headerlink" title="渲染"></a>渲染</h2><p>Android系统在渲染画面到显示屏上时，先把<code>View</code>的内容计算成多边形、纹理 ，再交由GPU 转换到不同的像素上进行显示， 后者称为栅格化（<strong>rasterization</strong>），是一个复杂耗时的过程。</p>
+<h3 id="Canvas"><a href="#Canvas" class="headerlink" title="Canvas"></a>Canvas</h3><p>Canvas 记录了一个<code>View</code>的绘制命令。<code>View</code>使用<code>Canvas</code>来发起绘制命令，比如绘制各种形状、<code>Bitmap</code>等。</p>
+<blockquote>
+<p>The Canvas class holds the “draw” calls. To draw something, you need 4 basic components: A Bitmap to hold the pixels, a Canvas to host the draw calls (writing into the bitmap), a drawing primitive (e.g. Rect, Path, text, Bitmap), and a paint (to describe the colors and styles for the drawing).</p>
+</blockquote>
+<h4 id="ClipRect"><a href="#ClipRect" class="headerlink" title="ClipRect"></a>ClipRect</h4><p><code>View</code>的内容绘制（<code>onDraw()</code>）本身并不关注脏区域，而是由<code>Canvas</code>的裁剪区域决定了哪些区域会被绘制。换言之，<code>View</code>在使用<code>Canvas</code>进行绘制时，<code>Canvas</code>已经根据脏区域设置了裁剪区域。</p>
+<h4 id="Matrix"><a href="#Matrix" class="headerlink" title="Matrix"></a>Matrix</h4><p><code>Canvas</code>有一个<code>Matrix</code>对象，用于记录当前的transformation。在<code>View.draw(Canvas canvas, ViewGroup parent, long drawingTime)</code>中，会根据<code>View</code>在父<code>View</code>中的坐标、translation以及scroll 等对<code>Canvas</code>的<code>Matrix</code>设置偏移，使得<code>View</code>的左上角对应到<code>Canvas</code>的原点。因此<code>View</code>在执行真正的绘制工作时（比如<code>onDraw()</code>），无需考虑偏移、缩放等。这也是为什么<code>View</code>的transformation不会影响布局。</p>
+<p>举个例子：当<code>View</code>的<code>translationY</code>不为0时，<code>View.onDraw()</code>在实现绘制时并不需要设置<code>Canvas</code>的偏移值，因为<code>Canvas</code>的<code>Matrix</code>已经记录了所有的transformation，<code>View</code>的开发者只需要关注内容的绘制。</p>
+<p>在使用View 动画<code>Animation</code>时，会从<code>Animation</code>中计算得到<code>Transformation</code>对象，并通过<code>Canvas.concat(TransformToApply.getMatrix())</code>将动画的当前结果（偏移、alpha等）设置到<code>Canvas</code>的<code>Matrix</code>中，从而绘制出动画中的这一帧。</p>
+<h3 id="View-的Matrix"><a href="#View-的Matrix" class="headerlink" title="View 的Matrix"></a>View 的Matrix</h3><p><code>View</code>也有一个<code>Matrix</code>对象，用于记录当前<code>View</code>的transformation（translation、scale、alpha等）。触摸事件在派发时，判断事件是否落在<code>View</code>的位置上时，会使用<code>View.getInverseMatrix().mapPoints(point)</code>来帮助计算事件与转换（移动、缩放、旋转）后的<code>View</code>的关系。</p>
+<h4 id="Animation"><a href="#Animation" class="headerlink" title="Animation"></a>Animation</h4><p>在View 动画中，是通过<code>Canvas</code>的<code>Matrix</code>使视图内容发生变化，而<code>View</code>本身的属性不变，因此<code>View</code>的触摸事件响应区域不随动画而改变。</p>
+<h4 id="Animator"><a href="#Animator" class="headerlink" title="Animator"></a>Animator</h4><p>在属性动画中，是通过设置<code>View</code>本身的属性，从而改变了<code>View</code>的<code>Matrix</code>，因此<code>View</code>的触摸事件响应区域会随着动画而改变。</p>
+<h2 id="绘制模型"><a href="#绘制模型" class="headerlink" title="绘制模型"></a>绘制模型</h2><p>Android 的绘制模型包括软件模型（Software-based drawing model） 和硬件加速模型（Hardware accelerated drawing model）。</p>
+<h3 id="Software-based-drawing-model"><a href="#Software-based-drawing-model" class="headerlink" title="Software-based drawing model"></a>Software-based drawing model</h3><p>每次绘制（重绘），都需要调用<code>Canvas</code>来发起绘制命令，也就是执行<code>View.onDraw()</code>等方法。</p>
+<p>invalidate 流程会将脏区域从<code>View</code>坐标（从脏<code>View</code>开始向父<code>View</code>递归计算）转换成屏幕坐标，在重绘时，所有与脏区域有交集的<code>View</code>都会重新绘制。</p>
+<p><code>View</code>绘制时使用的<code>Canvas</code>是由<code>ViewRootImpl</code>的<code>Surface.lockCanvas(Rect inOutDirty)</code>得来，整棵<code>View</code>树都是使用该对象进行绘制，创建的<code>Canvas</code>已经根据参数<code>inOutDirty</code>设置了裁剪区域，也就是脏区域。<code>View</code>的内容绘制（<code>onDraw()</code>）本身并不关注脏区域，而是由<code>Canvas</code>的裁剪区域决定了哪些区域会被绘制。</p>
+<h3 id="Hardware-accelerated-drawing-model"><a href="#Hardware-accelerated-drawing-model" class="headerlink" title="Hardware accelerated drawing model"></a>Hardware accelerated drawing model</h3><p><code>View</code>绘制时使用的<code>Canvas</code>是<code>DisplayListCanvas</code>，其不会马上执行绘制命令，而是使用Display Lists 来记录绘制操作，最后通过绘制Display Lists 来发起绘制命令。在重绘时，只有脏<code>View</code>需要重新创建Display List，也就是只有脏<code>View</code>的<code>onDraw()</code>等绘制方法会被执行。</p>
+<p>另一方面，对于诸如缩放、移动、旋转、设置alpha 等行为，也不需要执行脏<code>View</code>的<code>onDraw()</code>等绘制方法来重建Display List，直接设置Display List 的属性，即可交由GPU 进行计算。</p>
+<p>硬件加速减少了大量CPU 计算，将部分以浮点运算为主的操作交给擅长浮点运算的GPU 执行。</p>
+<p>在 android 26中，每个<code>View</code> 有一个<code>RenderNode</code>，硬件加速使用的<code>DisplayListCanvas</code>是由<code>RenderNode.start(int width, int height)</code>创建的，因此每个<code>View</code>在绘制时使用的<code>Canvas</code>不是同一个对象。</p>
+<h4 id="硬件加速使用"><a href="#硬件加速使用" class="headerlink" title="硬件加速使用"></a>硬件加速使用</h4><ul>
+<li><a href="https://developer.android.com/guide/topics/graphics/hardware-accel#controlling" target="_blank" rel="noopener">硬件加速开关</a></li>
+<li><a href="https://developer.android.com/guide/topics/graphics/hardware-accel#determining" target="_blank" rel="noopener">判断是否开启</a></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>用户界面是以<code>View</code>为基本模块，并以树的结构进行组织，所以像绘制、触摸事件处理、重绘请求等流程，都包含一个基本行为模式：遍历<code>View</code>树或者其子树：</p>
+<ul>
+<li>要么是从<code>ViewRootImpl</code>开始遍历<code>View</code>树，并根据一些条件跳过一些<code>View</code>树，或者选择遍历路径。</li>
+<li>要么是从某个节点开始，递归或循环遍历父节点，直到<code>ViewRootImpl</code>。</li>
+</ul>
+<p><code>View</code>是用户界面的蓝图，而<code>Canvas</code>是将界面蓝图输出到结果的工具（显示到屏幕上、或者绘制到<code>Bitmap</code>上）。</p>
+<p><code>View</code>和<code>Canvas</code>都有<code>Matrix</code>，前者的<code>Matrix</code>记录了<code>View</code>的transformation，而后者的用于控制内容的输出结果。<code>View</code>往往会根据自身的transformation以及<code>View</code>坐标，对<code>Canvas</code>的<code>Matrix</code>进行设置，使得绘制在预期的位置以及得到预期的绘制效果。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/View/View触摸事件/" rel="next" title="View触摸事件">
+                <i class="fa fa-chevron-left"></i> View触摸事件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Dex与类加载/MultiDex/" rel="prev" title="MultiDex">
+                MultiDex <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wb.email@foxmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#View树的绘制"><span class="nav-number">1.</span> <span class="nav-text">View树的绘制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自顶向下的绘制派发"><span class="nav-number">1.1.</span> <span class="nav-text">自顶向下的绘制派发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重绘请求"><span class="nav-number">1.2.</span> <span class="nav-text">重绘请求</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自底向上传递的invalidate-请求"><span class="nav-number">1.2.1.</span> <span class="nav-text">自底向上传递的invalidate 请求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#postInvalidate"><span class="nav-number">1.2.2.</span> <span class="nav-text">postInvalidate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#典型场景"><span class="nav-number">1.2.3.</span> <span class="nav-text">典型场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#渲染"><span class="nav-number">2.</span> <span class="nav-text">渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Canvas"><span class="nav-number">2.1.</span> <span class="nav-text">Canvas</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ClipRect"><span class="nav-number">2.1.1.</span> <span class="nav-text">ClipRect</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Matrix"><span class="nav-number">2.1.2.</span> <span class="nav-text">Matrix</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View-的Matrix"><span class="nav-number">2.2.</span> <span class="nav-text">View 的Matrix</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Animation"><span class="nav-number">2.2.1.</span> <span class="nav-text">Animation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Animator"><span class="nav-number">2.2.2.</span> <span class="nav-text">Animator</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绘制模型"><span class="nav-number">3.</span> <span class="nav-text">绘制模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Software-based-drawing-model"><span class="nav-number">3.1.</span> <span class="nav-text">Software-based drawing model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hardware-accelerated-drawing-model"><span class="nav-number">3.2.</span> <span class="nav-text">Hardware accelerated drawing model</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#硬件加速使用"><span class="nav-number">3.2.1.</span> <span class="nav-text">硬件加速使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

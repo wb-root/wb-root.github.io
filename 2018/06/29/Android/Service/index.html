@@ -117,7 +117,7 @@
 <meta property="og:description" content="摘抄关于Service的一些细节，以及AIDL的实战解读。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/AIDL%20Service.png">
-<meta property="og:updated_time" content="2018-07-02T08:39:12.688Z">
+<meta property="og:updated_time" content="2018-07-02T19:23:13.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Service">
 <meta name="twitter:description" content="摘抄关于Service的一些细节，以及AIDL的实战解读。">
@@ -350,7 +350,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-02 16:39:12" itemprop="dateModified" datetime="2018-07-02T16:39:12+08:00">2018-07-02</time>
+                <time title="修改时间：2018-07-03 03:23:13" itemprop="dateModified" datetime="2018-07-03T03:23:13+08:00">2018-07-03</time>
               
             
           </span>
@@ -385,7 +385,7 @@
       
 
       
-        <h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><h3 id="Fundamental"><a href="#Fundamental" class="headerlink" title="Fundamental"></a>Fundamental</h3><ul>
+        <h1 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h1><h2 id="Fundamental"><a href="#Fundamental" class="headerlink" title="Fundamental"></a>Fundamental</h2><ul>
 <li><p>Beginning with Android 5.0 (API level 21), the system throws an exception if you call <code>bindService()</code> with an <strong>implicit intent</strong>.</p>
 </li>
 <li><p>If your app targets API level 26 or higher, the system imposes <a href="https://developer.android.com/about/versions/oreo/background.html" target="_blank" rel="noopener">restrictions on running background services</a> when the app itself is not in the <strong>foreground</strong>. In most cases like this, your app should use a <a href="https://developer.android.com/topic/performance/scheduling.html" target="_blank" rel="noopener">scheduled job</a> instead. See also <a href="https://developer.android.com/about/versions/oreo/background.html#services" target="_blank" rel="noopener">Background Service Limitations</a>.</p>
@@ -413,7 +413,7 @@
 <li><p>Unless the service is bound to a client, the system destroys it when the service is stopped by calling <code>stopSelf()</code> or <code>stopService</code>. When the last client unbinds from the service, the system destroys the service, unless the service was also started by <code>startService()</code>. That is, the system destroys an service only after no clients bound to it and explicitly stopped if has been started.</p>
 </li>
 </ul>
-<h3 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL"></a>AIDL</h3><h4 id="AIDL-线程与阻塞"><a href="#AIDL-线程与阻塞" class="headerlink" title="AIDL 线程与阻塞"></a>AIDL 线程与阻塞</h4><ul>
+<h2 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL"></a>AIDL</h2><h3 id="AIDL-线程与阻塞"><a href="#AIDL-线程与阻塞" class="headerlink" title="AIDL 线程与阻塞"></a>AIDL 线程与阻塞</h3><ul>
 <li><p>A service runs in the <strong>main thread</strong> of its hosting process; the service does <strong>not</strong> create its own thread and does <strong>not</strong> run in a separate process unless you specify otherwise.</p>
 </li>
 <li><p>Calls made from the <strong>local process</strong> are executed in the <strong>same thread</strong> that is making the call.</p>
@@ -430,9 +430,8 @@
 </blockquote>
 </li>
 </ul>
-<h4 id="AIDL-接口定义"><a href="#AIDL-接口定义" class="headerlink" title="AIDL 接口定义"></a>AIDL 接口定义</h4><ul>
-<li><p>AIDL 接口是用Java语法定义的。</p>
-<p>By default, AIDL supports the following data types:</p>
+<h3 id="AIDL-接口定义"><a href="#AIDL-接口定义" class="headerlink" title="AIDL 接口定义"></a>AIDL 接口定义</h3><p>AIDL 接口是用Java语法定义的。</p>
+<h4 id="支持的类型"><a href="#支持的类型" class="headerlink" title="支持的类型"></a>支持的类型</h4><p>By default, AIDL supports the following data types:</p>
 <ul>
 <li><p>All primitive types in the Java programming language (such as <code>int</code>, <code>long</code>, <code>char</code>, <code>boolean</code>, and so on)</p>
 </li>
@@ -447,30 +446,54 @@
 <p>All elements in the <code>Map</code> must be one of the supported data types in this list or one of the other AIDL-generated interfaces or parcelables you’ve declared. Generic maps, (such as those of the form <code>Map&lt;String,Integer&gt;</code> are not supported. The actual concrete class that the other side receives is always a <code>HashMap</code>, although the method is generated to use the <code>Map</code> interface.</p>
 </li>
 </ul>
-<blockquote>
 <p>You must include an <code>import</code> statement for each additional type not listed above, even if they are defined in the same package as your interface.  </p>
-</blockquote>
-<blockquote>
-<p>All non-primitive parameters require a <strong>directional</strong> tag indicating which way the data goes. Either <code>in</code>, <code>out</code>, or <code>inout</code>. Primitives are <code>in</code> by default, and cannot be otherwise.</p>
+<h4 id="参数的directional标签"><a href="#参数的directional标签" class="headerlink" title="参数的directional标签"></a>参数的directional标签</h4><p>All non-primitive parameters require a <strong>directional</strong> tag indicating which way the data goes. Either <code>in</code>, <code>out</code>, or <code>inout</code>. Primitives are <code>in</code> by default, and cannot be otherwise.</p>
 <p>已验证：这个设定是为了节省传递数据的消耗。<code>in</code> 表示其修饰的参数仅用于提供数据给服务端，因此服务端对该参数的修改，不会影响客户端的实例。<code>out</code>则相反，表示其修饰的参数仅用于从服务端获取数据，接口实现中对该参数的修改将被传递给客户端。</p>
-<p>从根据aidl文件生成的java类中，也可以一见端倪。<code>Proxy</code>是客户端用于与<strong>远程</strong>接口交互的代理类，其持有的<code>BinderProxy</code>对象实现了<code>IBinder</code>接口，封装了与Binder驱动的交互细节。<code>Stub</code>是服务端的抽象类，继承了<code>Binder</code>，封装了远程连接的数据读写等操作，也声明了对aidl接口的实现，服务端的接口实现类继承<code>Stub</code>并<strong>实现</strong>aidl接口中声明的方法。对于<code>in</code>、<code>out</code>、<code>inout</code>修饰的参数，有如下特点：</p>
-<p>|       | <code>Proxy</code>在调用远程方法前 | <code>Proxy</code>在调用远程方法后 | <code>Stub</code>在调用aidl接口方法前               | <code>Stub</code>在调用aidl接口方法后 |<br>| :—- | :———————- | :———————- | :————————————— | :————————- |<br>| in    | 写入数据                | 不读取数据              | 读取数据                                 | 不写入数据                 |<br>| out   | 忽略参数                | 读取数据                | 直接生成指定类型的对象，并传递给实现方法 | 写入数据                   |<br>| inout | 写入数据                | 读取数据                | 读取数据                                 | 写入数据                   |</p>
-</blockquote>
-<blockquote>
-<p>Objects are reference <strong>counted</strong> across processes.</p>
-</blockquote>
-<blockquote>
-<p>No exceptions that you throw are sent back to the caller.</p>
+<p>从根据aidl文件生成的java类中，也可以一见端倪。<code>Proxy</code>是客户端用于与<strong>远程</strong>接口交互的代理类，其持有的<code>Binder</code>对象实现了<code>IBinder</code>接口，封装了与Binder驱动的交互细节。<code>Stub</code>是服务端的抽象类，继承了<code>Binder</code>，封装了远程连接的数据读写等操作，也声明了对aidl接口的实现，服务端的接口实现类继承<code>Stub</code>并<strong>实现</strong>aidl接口中声明的方法。对于<code>in</code>、<code>out</code>、<code>inout</code>修饰的参数，有如下特点：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"><code>Proxy</code>在调用远程方法前</th>
+<th style="text-align:left"><code>Proxy</code>在调用远程方法后</th>
+<th style="text-align:left"><code>Stub</code>在调用aidl接口方法前</th>
+<th style="text-align:left"><code>Stub</code>在调用aidl接口方法后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">in</td>
+<td style="text-align:left">写入数据</td>
+<td style="text-align:left">不读取数据</td>
+<td style="text-align:left">读取数据</td>
+<td style="text-align:left">不写入数据</td>
+</tr>
+<tr>
+<td style="text-align:left">out</td>
+<td style="text-align:left">忽略参数</td>
+<td style="text-align:left">读取数据</td>
+<td style="text-align:left">直接生成指定类型的对象，并传递给实现方法</td>
+<td style="text-align:left">写入数据</td>
+</tr>
+<tr>
+<td style="text-align:left">inout</td>
+<td style="text-align:left">写入数据</td>
+<td style="text-align:left">读取数据</td>
+<td style="text-align:left">读取数据</td>
+<td style="text-align:left">写入数据</td>
+</tr>
+</tbody>
+</table>
+<h4 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h4><p>No exceptions that you throw are sent back to the caller.</p>
 <p>验证：实际上服务端抛出的部分<code>RuntimeException</code>，是会传递给客户端的。以下描述仅对<strong><em>不</em></strong>被<code>oneway</code>修饰的接口有效。</p>
 <p>首先，由于服务端提供的<code>Binder</code>是根据aidl文件生成的，在生成的接口的方法签名中，只抛出了<code>RemoteException</code>，这意味着<code>Binder</code>的实现类中的方法，无法抛出其他<strong>非运行时</strong>的异常。</p>
 <p>对于抛出的<strong>运行时异常</strong>，从<code>Binder.execTransact()</code>和<code>Parcel.writeException()</code>可以看出，若是系统“已支持”的异常类型，会将该异常的信息写入数据流中，传递给客户端。而对于其他异常类型，将在<strong><em>服务端</em></strong>抛出<code>RuntimeException</code>。</p>
 <p>客户端的远程服务代理类<code>Proxy</code>会在调用<code>Binder.transact()</code>方法后，执行<code>Parcel.readException()</code>，该语句将读取服务端写入数据流中的异常信息，<strong>生成并抛出</strong>对应的异常实例。对于未被传递的异常，客户端读取不到异常。若远程方法因异常终止执行，未将返回值写入数据流（如果该方法有返回值的话），客户端从数据流中也读取不到返回值。</p>
-</blockquote>
-</li>
-<li><p><code>Parcel</code>是传输数据的管道，<code>Parcelable</code>是一个接口，表示其可被<code>Parcel</code>传输。</p>
-</li>
-</ul>
 <h4 id="AIDL类图"><a href="#AIDL类图" class="headerlink" title="AIDL类图"></a>AIDL类图</h4><p><img src="http://pb88ntxoi.bkt.clouddn.com/image/android/AIDL%20Service.png" alt="AIDL Service"></p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<li>Objects are reference <strong>counted</strong> across processes.</li>
+<li><code>Parcel</code>是传输数据的管道，<code>Parcelable</code>是一个接口，表示其可被<code>Parcel</code>传输。</li>
+</ul>
 
       
     </div>
@@ -514,8 +537,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/29/Android/Permissions/" rel="prev" title="Android Permission">
-                Android Permission <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/29/Android/Android杂记/" rel="prev" title="Android 杂记">
+                Android 杂记 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -594,7 +617,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-count">22</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -649,7 +672,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">1.</span> <span class="nav-text">Service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fundamental"><span class="nav-number">1.1.</span> <span class="nav-text">Fundamental</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL"><span class="nav-number">1.2.</span> <span class="nav-text">AIDL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL-线程与阻塞"><span class="nav-number">1.2.1.</span> <span class="nav-text">AIDL 线程与阻塞</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL-接口定义"><span class="nav-number">1.2.2.</span> <span class="nav-text">AIDL 接口定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL类图"><span class="nav-number">1.2.3.</span> <span class="nav-text">AIDL类图</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Service"><span class="nav-number">1.</span> <span class="nav-text">Service</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fundamental"><span class="nav-number">1.1.</span> <span class="nav-text">Fundamental</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AIDL"><span class="nav-number">1.2.</span> <span class="nav-text">AIDL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL-线程与阻塞"><span class="nav-number">1.2.1.</span> <span class="nav-text">AIDL 线程与阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL-接口定义"><span class="nav-number">1.2.2.</span> <span class="nav-text">AIDL 接口定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#支持的类型"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">支持的类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参数的directional标签"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">参数的directional标签</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#异常"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">异常</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL类图"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">AIDL类图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>

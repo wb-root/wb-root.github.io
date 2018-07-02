@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="记录一些Java的语法特性，部分涉及其编译现象。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java杂记">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Java/Java杂记/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="记录一些Java的语法特性，部分涉及其编译现象。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T09:09:54.987Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java杂记">
+<meta name="twitter:description" content="记录一些Java的语法特性，部分涉及其编译现象。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Java/Java杂记/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java杂记 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Java/Java杂记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java杂记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 17:09:54" itemprop="dateModified" datetime="2018-07-02T17:09:54+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">记录一些Java的语法特性，部分涉及其编译现象。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="字符与字符串"><a href="#字符与字符串" class="headerlink" title="字符与字符串"></a>字符与字符串</h2><h3 id="字符集与字符编码"><a href="#字符集与字符编码" class="headerlink" title="字符集与字符编码"></a><a href="http://blog.jobbole.com/84903/" target="_blank" rel="noopener">字符集与字符编码</a></h3><ul>
+<li>代码点（code point）是指与一个编码表中的某个字符对应的代码值，比如<code>A</code>的代码点是<code>65（\u0041）</code>。</li>
+<li>代码单元（code unit）<ul>
+<li>在基本多语言级别中，每个字符用16位表示，称为代码单元。</li>
+<li>其他级别中的字符采用一对连续的代码单元进行编码。</li>
+</ul>
+</li>
+<li>Java中采用UTF-16。<code>char</code>用两个字节（16位）来表示一个字符，所以<code>char</code>不能描述所有Unicode字符。因此不建议使用<code>char</code>。</li>
+</ul>
+<h3 id="String"><a href="#String" class="headerlink" title="String"></a><code>String</code></h3><ul>
+<li><p><code>String.length()</code>返回的是字符串的代码单元的数量，而不是代码点的数量。</p>
+<p>即”\uD801\uDC37”实际上表示一个字符，但需要两个代码单元来描述。</p>
+</li>
+<li><p><code>String.codePointCount(0, String.length())</code>返回的才是代码点的数量，也就是字符的数量。</p>
+</li>
+<li><code>String.charAt(n)</code>返回位置<code>n</code>的代码单元。</li>
+<li><code>String.codePointAt(String.offsetByCodePoints(0, i))</code>返回的才是位置<code>i</code>的代码点。</li>
+<li><code>String</code>是不可变字符串，没有提供修改字符串的行为，<code>String</code>的拼接或提取等都是产生新的<code>String</code>对象。</li>
+</ul>
+<h3 id="StringBuilder"><a href="#StringBuilder" class="headerlink" title="StringBuilder"></a><code>StringBuilder</code></h3><ul>
+<li>为了避免“修改”字符串时，产生大量新对象，可使用<code>StringBuilder</code>，其内部实现是一个<code>char[]</code>。</li>
+<li>采用<code>+</code>运算符来拼接<code>String</code>，编译后实际上是使用<code>StringBuilder</code>，并且每一个使用<code>+</code>的语句，都会创建一个<code>StringBuilder</code>对象。</li>
+</ul>
+<h3 id="StringBuffer"><a href="#StringBuffer" class="headerlink" title="StringBuffer"></a><code>StringBuffer</code></h3><p><code>StringBuilder</code>的线程安全版本，使用<code>synchronized</code>。</p>
+<h2 id="包装类"><a href="#包装类" class="headerlink" title="包装类"></a>包装类</h2><ul>
+<li><p>内部有一个对应的基本类型的<code>final</code>成员<code>value</code>。</p>
+</li>
+<li><p>包装类会自动打包，本质是调用包装类的<code>static</code>方法<code>valueOf()</code>来创建一个包装类对象。</p>
+</li>
+<li><p>包装类会自动拆包，本质是调用包装类<strong>对象</strong>的<code>intValue()</code>等方法来返回<code>value</code>成员。</p>
+</li>
+<li><p>值得一提的是，<code>Integer</code>和<code>Long</code>有缓存机制，会将值落在[-128, 127]（上限可被虚拟机参数修改）范围内的<code>Integer</code>和<code>Long</code>对象缓存起来，因此不会重复创建对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//a 跟 b是同一个对象，a == b 返回true</span></span><br><span class="line">Integer a = <span class="number">37</span>, b = <span class="number">37</span>;</span><br><span class="line"><span class="comment">//c 跟 d不是同一个对象，c == d 返回false</span></span><br><span class="line">Integer c = <span class="number">137</span>, d = <span class="number">137</span>;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h2><p>内部类是一种<strong>编译器现象</strong>，对于虚拟机而言，并不知道内部类的存在，编译器会把内部类编译成用$符号分隔外部类名和内部类名的常规类文件，虚拟机将其当做常规类文件处理。 并通过修改内部类的构造器等行为，绕过权限控制。</p>
+<h3 id="非静态内部类"><a href="#非静态内部类" class="headerlink" title="非静态内部类"></a>非静态内部类</h3><p>编译器会在非静态内部类中添加一个<strong>外部类类型</strong>的<code>final</code>成员<code>this$0</code>，并通过修改内部类的所有构造器，添加一个外部类的引用参数，在创建内部类对象时，将实例化该内部类的外部类对象作为参数传入构造器，再将该参数赋值给<code>this$0</code>。</p>
+<h3 id="访问私有成员"><a href="#访问私有成员" class="headerlink" title="访问私有成员"></a>访问私有成员</h3><p>内部类和外部类之间可以相互调用<strong>私有成员</strong>（包括field和method）。编译器会为<strong>被调用</strong>的私有成员生成具有包权限的静态方法，内部类和外部类通过这些静态方法来相互调用<strong>私有成员</strong>。</p>
+<p>值得一提的是，如果调用的是非静态成员，自动生成的静态方法会带有一个对方类型的参数。</p>
+<h4 id="field"><a href="#field" class="headerlink" title="field"></a>field</h4><p>对于被调用的私有field，编译器会生成具有包权限的静态方法，来get和set field。</p>
+<h4 id="method"><a href="#method" class="headerlink" title="method"></a>method</h4><p>对于被调用的私有method，编译器会生成具有包权限的静态方法，该方法会调用私有method。</p>
+<h3 id="局部内部类"><a href="#局部内部类" class="headerlink" title="局部内部类"></a>局部内部类</h3><p>定义在局部块（方法）中的类称为局部内部类。</p>
+<p>局部内部类可以访问<code>final</code>的局部变量。编译器会为局部内部类添加一个<strong>该局部变量类型</strong>的<code>final</code>field，添加一个构造函数，并将被调用的局部变量作为参数，对其进行赋值。</p>
+<h3 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h3><p>正如上文所言，非静态内部类因持有外部类对象以及局部变量，容易造成内存泄露。</p>
+<p>除了显式声明为静态内部类，在外部类的静态方法中声明的局部内部类，也是静态内部类，不会隐式持有外部类对象（因为不存在）。</p>
+<p>对于局部变量，可用弱引用等进行包装。</p>
+<h2 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h2><h3 id="编译结果"><a href="#编译结果" class="headerlink" title="编译结果"></a>编译结果</h3><p>编译后实际上是一个类，access flags 为 <code>0x4031[public final enum]</code>，继承自<code>java.lang.Enum</code>。</p>
+<h3 id="枚举值"><a href="#枚举值" class="headerlink" title="枚举值"></a>枚举值</h3><p>一个枚举类型的每个值都是该类的一个<code>final static</code>的实例对象。在字节码文件中可以看到，编译器自动生成了一个静态初始化块，在该初始化块中，会对每个值进行初始化。</p>
+<h2 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h2><h3 id="Serializable"><a href="#Serializable" class="headerlink" title="Serializable"></a><code>Serializable</code></h3><ul>
+<li><p>是一个<strong>标记接口</strong>，声明实现<code>Serializable</code>的类，其对象可被<code>ObjectOutputStream</code>和<code>ObjectInputStream</code>序列化和反序列化。<code>Serializable</code>标记的类默认会序列化所有不被<code>static</code>和<code>transient</code>修饰的成员。</p>
+</li>
+<li><p><code>private static final long serialVersionUID</code></p>
+<ul>
+<li>可用于做序列化的<strong>版本兼容</strong>。</li>
+<li>控制非法反序列化。没有正确<code>serialVersionUID</code>的程序无法对序列化的字节码进行反序列化。</li>
+</ul>
+</li>
+<li><p>用<code>transient</code>修饰的成员不会被序列化。</p>
+</li>
+<li><p><strong>添加</strong>以下方法，替换默认的序列化行为，达到加密、序列化特定成员等目的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(ObjectOutputStream out)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(ObjectInputStream in)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Externalizable"><a href="#Externalizable" class="headerlink" title="Externalizable"></a><code>Externalizable</code></h3><p>继承于<code>Serializable</code>，但默认不序列化任何成员，需要自定义序列化行为，类似于android中的<code>Parcelable</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Externalizable</span> <span class="keyword">extends</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">writeExternal</span><span class="params">(ObjectOutput out)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">readExternal</span><span class="params">(ObjectInput in)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="加密包装类"><a href="#加密包装类" class="headerlink" title="加密包装类"></a>加密包装类</h3><p><code>javax.crypto.SealedObject</code> 和<code>java.security.SignedObject</code> 可用于包装<code>Serializable</code>的实现类，它们定义了加密的序列化行为。</p>
+<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><ul>
+<li><p><strong>继承和持有对象的选择</strong></p>
+<p>有时候我们面临着这么一个情况，当我们需要一个类B来扩展一个类A时，是选择继承A，还是持有A的一个对象引用。这两者的区别如下： </p>
+<ul>
+<li>对于客户端需要的调用方法，前者可选择性复写并添加父类A的方法来实现自己的逻辑功能，而后者需要全部提供入口 。</li>
+<li>前者只能拥有父类A的方法属性，而无法拥有A的其他子类的。而后者，则可以引用类A及其所有子类。</li>
+<li>在设计模式中，前者拥有适配器的特点，Adapter包含并重定义了Adaptee的方法，以提供给客户端需要的接口。而后者更接近于门面模式，封装了内部复杂的模块，只提供必需的接口给客户端。</li>
+</ul>
+</li>
+<li><p><strong>宽接口与窄接口。</strong>有时候对于一个类，在内部模块（可能在同一个包或不同的包下，跨包情况下default权限并不能很好地起作用）希望提供正常使用的接口，而对外进行访问限制，例如单纯只被引用，可以考虑，实现两个接口，一个用于内部模块，一个用于外部模块，各自声明拥有仅需的方法。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Java/异步与同步机制/" rel="next" title="Java中的异步与同步">
+                <i class="fa fa-chevron-left"></i> Java中的异步与同步
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/支持不同的屏幕/" rel="prev" title="Android 支持不同的屏幕">
+                Android 支持不同的屏幕 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符与字符串"><span class="nav-number">1.</span> <span class="nav-text">字符与字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符集与字符编码"><span class="nav-number">1.1.</span> <span class="nav-text">字符集与字符编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#String"><span class="nav-number">1.2.</span> <span class="nav-text">String</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StringBuilder"><span class="nav-number">1.3.</span> <span class="nav-text">StringBuilder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StringBuffer"><span class="nav-number">1.4.</span> <span class="nav-text">StringBuffer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#包装类"><span class="nav-number">2.</span> <span class="nav-text">包装类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内部类"><span class="nav-number">3.</span> <span class="nav-text">内部类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#非静态内部类"><span class="nav-number">3.1.</span> <span class="nav-text">非静态内部类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问私有成员"><span class="nav-number">3.2.</span> <span class="nav-text">访问私有成员</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#field"><span class="nav-number">3.2.1.</span> <span class="nav-text">field</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#method"><span class="nav-number">3.2.2.</span> <span class="nav-text">method</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部内部类"><span class="nav-number">3.3.</span> <span class="nav-text">局部内部类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存泄露"><span class="nav-number">3.4.</span> <span class="nav-text">内存泄露</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#枚举"><span class="nav-number">4.</span> <span class="nav-text">枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译结果"><span class="nav-number">4.1.</span> <span class="nav-text">编译结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#枚举值"><span class="nav-number">4.2.</span> <span class="nav-text">枚举值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化"><span class="nav-number">5.</span> <span class="nav-text">序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Serializable"><span class="nav-number">5.1.</span> <span class="nav-text">Serializable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Externalizable"><span class="nav-number">5.2.</span> <span class="nav-text">Externalizable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加密包装类"><span class="nav-number">5.3.</span> <span class="nav-text">加密包装类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计"><span class="nav-number">6.</span> <span class="nav-text">设计</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

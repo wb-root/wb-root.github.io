@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Android资源编译相关细节。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 资源编译">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Android 资源/资源编译/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="Android资源编译相关细节。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T04:38:27.836Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 资源编译">
+<meta name="twitter:description" content="Android资源编译相关细节。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Android 资源/资源编译/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android 资源编译 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Android 资源/资源编译/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 资源编译
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 12:38:27" itemprop="dateModified" datetime="2018-07-02T12:38:27+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">Android资源编译相关细节。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h1><p>文中所说的<strong>资源</strong>，是指res目录下的资源，不包含asset目录下的资源。</p>
+<h1 id="编译对象"><a href="#编译对象" class="headerlink" title="编译对象"></a>编译对象</h1><h2 id="资源包"><a href="#资源包" class="headerlink" title="资源包"></a>资源包</h2><p>一般而言，App会引用两个资源包，一个是系统资源包，一个是App自身的资源包（包括App依赖的其他模块中的资源）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在xml中引用资源的完整格式：</span><br><span class="line">package:type/entry</span><br><span class="line">在Java代码中引用资源的完整格式：</span><br><span class="line">package.R.type.entry</span><br></pre></td></tr></table></figure>
+<h3 id="系统资源包"><a href="#系统资源包" class="headerlink" title="系统资源包"></a>系统资源包</h3><p>系统资源包仅在构建的时候引用，不会导出到Apk中。系统资源包的包名是<code>android</code>，App在引用系统资源包的时候需要指定此包名。</p>
+<h3 id="App资源包"><a href="#App资源包" class="headerlink" title="App资源包"></a>App资源包</h3><p>App资源包中的资源包含主模块的资源以及依赖的模块中资源。其构建有两个特点：</p>
+<h4 id="资源整合"><a href="#资源整合" class="headerlink" title="资源整合"></a>资源整合</h4><p>将资源包中的所有模块的资源整合在一起，为它们分配唯一的id，生成一个统一的<code>package.R</code>类（<code>package</code>是主模块的包名），通过这个<code>R</code>类可以唯一识别并引用资源包中的任意资源。</p>
+<p>同时，每个包含资源的子模块，也会有对应的<code>modulePkg.R</code>类（<code>modulePkg</code>是子模块的包名）。猜测是因为子模块中在引用资源的时候用的是这个<code>R</code>类，因此构建的时候，要么需要将所有子模块对其<code>R</code>类的引用改为对主模块<code>R</code>类的引用，要么就需要保留子模块的<code>R</code>类。Android采取了后者，安全省事。</p>
+<p>值得一提的是，在各个模块的<code>R</code>类中，同一个资源项的id是相同的。比如<code>package.R.string.ok</code>和<code>modulePkg.R.string.ok</code>的id是同一个值。</p>
+<h3 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h3><p>不同的<code>variant</code>或者模块可能存在<strong>同类型的同名资源</strong>，它们有着不同的优先级，android在构建的时候，会选择优先级最高的资源，以此来解决冲突。</p>
+<h1 id="编译步骤"><a href="#编译步骤" class="headerlink" title="编译步骤"></a>编译步骤</h1><p>资源编译主要涉及两方面内容：<strong>编译资源文件</strong>和<strong>创建资源索引</strong>。下文描述顺序不代表编译流程的先后顺序。</p>
+<h2 id="编译资源文件"><a href="#编译资源文件" class="headerlink" title="编译资源文件"></a>编译资源文件</h2><p>构建时会对各种格式的资源文件进行处理，以下描述仅针对xml文件的编译。xml资源可分两类：values和其他。两者的编译方式有所不同。</p>
+<h3 id="values资源"><a href="#values资源" class="headerlink" title="values资源"></a>values资源</h3><p>values资源编译的时候，不会生成对应的二进制文件，所有的values资源最终会被整合到<code>resources.arsc</code>文件中。</p>
+<h3 id="其他资源"><a href="#其他资源" class="headerlink" title="其他资源"></a>其他资源</h3><p>其他xml资源的编译，会生成对应的二进制文件。</p>
+<h3 id="编译特点"><a href="#编译特点" class="headerlink" title="编译特点"></a>编译特点</h3><ul>
+<li><p>提取字符串</p>
+<p>类似于Dex文件，资源编译的时候也会将所有的字符串提取出来，放到字符串常量池。字符串包括标签名、属性名和xml文件中出现的字符串字面量。</p>
+</li>
+<li><p>解析引用</p>
+<p>将文件中对资源的引用解析为资源id或字面量等。</p>
+</li>
+<li><p>生成二进制文件</p>
+<p>xml文件的编译过程，可以看做是将xml原始文件解析成一个数据结构，再将数据结构进行持久化，生成二进制文件。</p>
+</li>
+</ul>
+<h2 id="创建资源索引"><a href="#创建资源索引" class="headerlink" title="创建资源索引"></a>创建资源索引</h2><p>分配资源id，生成<code>R</code>类和资源索引表resources.arsc文件。</p>
+<h3 id="资源id"><a href="#资源id" class="headerlink" title="资源id"></a>资源id</h3><p>每个资源项会被分配一个资源id。</p>
+<h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><p>资源id是一个<code>int</code>类型的常量。从高到低，第一个字节表示package id，第二个字节描述资源类型，第三和第四个字节共16位，描述给定资源类型下的具体资源项。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">16进制表示的资源id，PP描述包，TT描述类型，EEEE描述具体资源项：</span><br><span class="line">PPTTEEEE</span><br></pre></td></tr></table></figure>
+<h4 id="分配"><a href="#分配" class="headerlink" title="分配"></a>分配</h4><h5 id="默认分配方式"><a href="#默认分配方式" class="headerlink" title="默认分配方式"></a>默认分配方式</h5><ol>
+<li><p>package id</p>
+<p>系统资源的package id是<code>0x01</code>，而App资源的package id默认是<code>0x7F</code>。[0x01, 0x7f]是合法的资源package id范围。</p>
+</li>
+<li><p>TTEEEE</p>
+<p> 一般而言，TTEEEE的分配是根据资源类型和命名排序的。如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">R.color.black = 0x7f010000</span><br><span class="line">R.color.white = 0x7f010001</span><br><span class="line">R.string.app_name = 0x7f020000</span><br><span class="line">R.string.hello = 0x7f020001</span><br></pre></td></tr></table></figure>
+<p> 因此，当发生资源增加、减少或改名时，可能会改变其他资源项的id值。此特性在以下场景需要注意：</p>
+<ul>
+<li>系统资源包中的资源id不可发生改变。</li>
+<li>App资源包发生改变时会重新构建，不受影响。但是对于插件化或者皮肤等场景，如果需要动态改变资源，需要考虑资源id的影响。</li>
+</ul>
+</li>
+</ol>
+<h5 id="使用public-xml"><a href="#使用public-xml" class="headerlink" title="使用public.xml"></a>使用public.xml</h5><p>在android的res目录下提供public.xml文件，可用于指定资源的id。public.xml文件的内容格式如下。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">public</span> <span class="attr">type</span>=<span class="string">"string"</span> <span class="attr">name</span>=<span class="string">"app_name"</span> <span class="attr">id</span>=<span class="string">"0x7f060000"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>以上例子将<code>app_name</code>的id指定为<code>0x7f060000</code>。值得一提的是，此方法不能指定package id。</p>
+<h3 id="R类"><a href="#R类" class="headerlink" title="R类"></a><code>R</code>类</h3><p>开发者可通过<code>R</code>类引用资源。</p>
+<h3 id="resources-arsc-文件"><a href="#resources-arsc-文件" class="headerlink" title="resources.arsc 文件"></a>resources.arsc 文件</h3><p>resources.arsc文件记录了资源id与资源的映射关系，也存储了<strong>values</strong>类型资源。系统在运行App时，需要加载resources.arsc文件并进行解析，才能根据资源id加载资源。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/Dex与类加载/类加载机制/" rel="next" title="类加载">
+                <i class="fa fa-chevron-left"></i> 类加载
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Dex与类加载/Dex文件/" rel="prev" title="Dex文件">
+                Dex文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#约定"><span class="nav-number">1.</span> <span class="nav-text">约定</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译对象"><span class="nav-number">2.</span> <span class="nav-text">编译对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源包"><span class="nav-number">2.1.</span> <span class="nav-text">资源包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系统资源包"><span class="nav-number">2.1.1.</span> <span class="nav-text">系统资源包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#App资源包"><span class="nav-number">2.1.2.</span> <span class="nav-text">App资源包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#资源整合"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">资源整合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决冲突"><span class="nav-number">2.1.3.</span> <span class="nav-text">解决冲突</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译步骤"><span class="nav-number">3.</span> <span class="nav-text">编译步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译资源文件"><span class="nav-number">3.1.</span> <span class="nav-text">编译资源文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#values资源"><span class="nav-number">3.1.1.</span> <span class="nav-text">values资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他资源"><span class="nav-number">3.1.2.</span> <span class="nav-text">其他资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译特点"><span class="nav-number">3.1.3.</span> <span class="nav-text">编译特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建资源索引"><span class="nav-number">3.2.</span> <span class="nav-text">创建资源索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源id"><span class="nav-number">3.2.1.</span> <span class="nav-text">资源id</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#结构"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分配"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">分配</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#默认分配方式"><span class="nav-number">3.2.1.2.1.</span> <span class="nav-text">默认分配方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用public-xml"><span class="nav-number">3.2.1.2.2.</span> <span class="nav-text">使用public.xml</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#R类"><span class="nav-number">3.2.2.</span> <span class="nav-text">R类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#resources-arsc-文件"><span class="nav-number">3.2.3.</span> <span class="nav-text">resources.arsc 文件</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

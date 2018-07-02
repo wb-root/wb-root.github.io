@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="浅析Java异常机制。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java异常机制">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Java/异常机制/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="浅析Java异常机制。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://pb88ntxoi.bkt.clouddn.com/image/java/%E5%BC%82%E5%B8%B8%E5%88%86%E7%B1%BB%E4%B8%8E%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png">
+<meta property="og:updated_time" content="2018-07-02T12:30:47.270Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java异常机制">
+<meta name="twitter:description" content="浅析Java异常机制。">
+<meta name="twitter:image" content="http://pb88ntxoi.bkt.clouddn.com/image/java/%E5%BC%82%E5%B8%B8%E5%88%86%E7%B1%BB%E4%B8%8E%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Java/异常机制/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java异常机制 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Java/异常机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java异常机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 20:30:47" itemprop="dateModified" datetime="2018-07-02T20:30:47+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">浅析Java异常机制。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="异常机制"><a href="#异常机制" class="headerlink" title="异常机制"></a>异常机制</h2><h3 id="异常分类与继承关系"><a href="#异常分类与继承关系" class="headerlink" title="异常分类与继承关系"></a>异常分类与继承关系</h3><p><img src="http://pb88ntxoi.bkt.clouddn.com/image/java/%E5%BC%82%E5%B8%B8%E5%88%86%E7%B1%BB%E4%B8%8E%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png" alt="异常分类与继承关系"></p>
+<h4 id="Error"><a href="#Error" class="headerlink" title="Error"></a><code>Error</code></h4><p><code>Error</code>及其子类，描述了Java运行时系统的内部错误和资源耗尽错误。应用程序开发者不应该使用<code>Error</code>。原则上，出现<code>Error</code>时，最多只能保证尽快安全地终止程序。</p>
+<h4 id="Exception"><a href="#Exception" class="headerlink" title="Exception"></a><code>Exception</code></h4><p>应用开发者主要面对<code>Exception</code>，其分为两大类：<code>RuntimeException</code>与编译时异常。</p>
+<h5 id="RuntimeExcetpion"><a href="#RuntimeExcetpion" class="headerlink" title="RuntimeExcetpion"></a><code>RuntimeExcetpion</code></h5><p>运行时异常，或称为未受检异常（unchecked exception）。由应用程序错误导致的异常属于<code>RuntimeException</code>。如错误的类型转换，数组越界等，这些错误往往是由应用开发者的错误导致。因此“如果出现<code>RuntimeException</code>异常，那么就一定是你的问题”。</p>
+<h5 id="编译时异常"><a href="#编译时异常" class="headerlink" title="编译时异常"></a>编译时异常</h5><p>或称为受检异常（checked exception）。应用程序本身没有问题，但由于像I/O错误这类问题导致的异常属于编译时异常。</p>
+<h3 id="使用异常"><a href="#使用异常" class="headerlink" title="使用异常"></a>使用异常</h3><h4 id="使用异常-1"><a href="#使用异常-1" class="headerlink" title="使用异常"></a>使用异常</h4><ul>
+<li>对于可能发生的错误，有两种方法通知调用者。一种是通过返回值，一种是抛出异常。异常处理机制，也是对责任链模式的运用。使用异常，一定程度上可以让开发者专注于业务，而非错误处理，并让“合适的”处理者来处理异常。</li>
+<li>有些情况，无法从返回值中区分是否遭遇了错误，此时可使用异常。</li>
+<li>原则：对于可恢复的情况，使用<strong>受检异常</strong>；对于程序错误，则使用<strong>运行时异常</strong>。</li>
+</ul>
+<h4 id="不使用异常"><a href="#不使用异常" class="headerlink" title="不使用异常"></a>不使用异常</h4><ul>
+<li>异常处理机制更耗时。</li>
+<li>在某些情况下，API方法遇到的错误是调用者的疏忽造成的，而这种错误，调用者可以通过诸如判空、判断是否可执行等来避免，这种情况下应该提供这些检测方法，而不是一味地抛出异常，特别是受检异常。</li>
+</ul>
+<h3 id="线程异常处理器"><a href="#线程异常处理器" class="headerlink" title="线程异常处理器"></a>线程异常处理器</h3><p><code>UncaughtExceptionHandler</code>是线程用于处理异常的接口，如果异常没有被调用栈处理，JVM在终止线程（而不是进程）之前，会先调用线程异常处理器。开发者可通过设置线程异常处理器来保障应用安全地终止。值得一提的是，此处理器，并不能阻止线程的终止。</p>
+<ul>
+<li>可以通过<code>Thread</code>对象的<code>setUncaughtExceptionHandler()</code>方法给线程设置异常处理器。</li>
+<li>也可以通过<code>Thread</code>的静态方法<code>setDefaultUncaughtExceptionHandler()</code>方法给所有线程设置<strong>默认异常处理器</strong>。前者优先级更高。</li>
+<li>如果不为独立的线程设置处理器，其处理器就是该线程的<code>ThreadGroup</code>对象，该类实现了<code>Thread.UncaughtExceptionHandler</code>接口。其行为如下：<ul>
+<li>如果线程组有父线程组，调用父线程组的<code>UnCaughtException()</code>方法。</li>
+<li>否则，如果有默认处理器，调用该处理器。</li>
+<li>否则，如果<code>Throwable</code>是<code>ThreadDeath</code>的一个实例，什么都不做。</li>
+<li>否则，线程的名字以及<code>Throwable</code>的栈踪迹被输出到<code>System.err</code>上。</li>
+</ul>
+</li>
+</ul>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><ul>
+<li><p>一旦某个方法遭遇异常，将抛出异常并立刻退出，而不返回任何值，此外，调用此方法的代码也将无法继续执行，而是异常处理机制开始搜索异常处理器。直到异常处理器处理之后，便可以继续执行处理器之后的代码。</p>
+</li>
+<li><p>子类重写的方法抛出的异常不能超过父类，因此如果子类的重写方法代码可能遭遇异常，需要在子类中捕获异常。</p>
+</li>
+<li><p>再次抛出异常与异常链：在<code>catch</code>子句中可以再抛出异常，这样做的目的是改变异常类型。比如子系统抛出的异常，可能在其他系统有不同的异常类型表示，这时候可先捕获再抛出新的异常。同时，可调用新抛出的异常对象的<code>initCause()</code> 方法，把原始异常作为参数传入，在之后捕获异常时，可以使用<code>getCause()</code>方法重新得到原始异常。</p>
+</li>
+<li><p><code>try</code>语句块之后可以不跟<code>catch</code>而直接跟<code>finally</code>，这样就可以在不处理异常的情况下，执行一些必须执行的工作，比如回收资源。</p>
+</li>
+<li><p>以下写法不仅逻辑清晰，内嵌<code>try</code>语句负责收尾工作，外部<code>try</code>语句负责处理异常，并且外部的<code>catch</code>子句还能捕获<code>finally</code>子句抛出的异常。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="comment">//...回收资源</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>finally</code>子句只有在<code>try</code>语句块被进入（不被条件语句跳过等）的情况下，才会被执行。</p>
+</li>
+<li><p><code>finally</code>子句的缺陷。当<code>finally</code>子句也抛出异常时，会覆盖<code>try</code>子句抛出的异常。最好的办法是就地捕获<code>finally</code>语句中抛出的异常。</p>
+</li>
+<li><p><code>Throwable.getStackTrace()</code>方法将返回一个<code>StackTraceElement</code>对象的数组，该数组是对一个方法调用过程的堆栈追踪。 类似的有<code>Thread</code>的静态方法的<code>getAllStackTrace()</code>方法，提供对所有线程的堆栈追踪。 </p>
+</li>
+<li><p><code>try-with-resources</code>语句，会把资源（<code>AutoCloseable</code>或 <code>Closeable</code>）对象在<code>try</code>代码块执行结束或捕捉异常后，执行<code>close()</code>方法，<code>close()</code>方法如果抛出异常，将调用该方法抛出的异常的<code>addSuppressed()</code>方法，并将关闭异常作为参数传入，如果该方法未抛异常，则无此步骤。</p>
+</li>
+</ul>
+<h3 id="编译结果"><a href="#编译结果" class="headerlink" title="编译结果"></a>编译结果</h3><p>在Java的字节码中，异常处理器不是通过指令实现，而是通过Exception Table。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public void tryFunc();</span><br><span class="line">  descriptor: ()V</span><br><span class="line">  flags: ACC_PUBLIC</span><br><span class="line">  Code:</span><br><span class="line">    stack=2, locals=3, args_size=1</span><br><span class="line">       0: new           #8                  // class java/lang/RuntimeException</span><br><span class="line">       3: dup</span><br><span class="line">       4: invokespecial #9                  // Method java/lang/RuntimeException.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">       7: athrow</span><br><span class="line">       8: astore_1</span><br><span class="line">       9: goto          15</span><br><span class="line">      12: astore_2</span><br><span class="line">      13: aload_2</span><br><span class="line">      14: athrow</span><br><span class="line">      15: return</span><br><span class="line">    Exception table:</span><br><span class="line">       from    to  target type</span><br><span class="line">           0     8     8   Class java/lang/Exception</span><br><span class="line">           0     9    12   any</span><br></pre></td></tr></table></figure>
+<p><code>from</code>和<code>to</code>描述<code>try</code>块的开始和结束的行数，<code>target</code>指的是处理异常的行数。这里的行数，指的是字节码方法中的行数，而不是源码中的行数。</p>
+<p>上例中，当方法中的第0行（含）到第8行（不含）之间抛出<code>Exception</code>时，跳转到第8行，开始处理异常。<code>finally</code>子句的本质，也是在Exception Table中添加处理器（并重新抛出异常），来保证会被执行，如上例中的第二个处理器。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Java/泛型/" rel="next" title="Java中的泛型">
+                <i class="fa fa-chevron-left"></i> Java中的泛型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Java/异步与同步机制/" rel="prev" title="Java中的异步与同步">
+                Java中的异步与同步 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#异常机制"><span class="nav-number">1.</span> <span class="nav-text">异常机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#异常分类与继承关系"><span class="nav-number">1.1.</span> <span class="nav-text">异常分类与继承关系</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Error"><span class="nav-number">1.1.1.</span> <span class="nav-text">Error</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Exception"><span class="nav-number">1.1.2.</span> <span class="nav-text">Exception</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RuntimeExcetpion"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">RuntimeExcetpion</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#编译时异常"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">编译时异常</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用异常"><span class="nav-number">1.2.</span> <span class="nav-text">使用异常</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用异常-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">使用异常</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不使用异常"><span class="nav-number">1.2.2.</span> <span class="nav-text">不使用异常</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程异常处理器"><span class="nav-number">1.3.</span> <span class="nav-text">线程异常处理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#细节"><span class="nav-number">1.4.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译结果"><span class="nav-number">1.5.</span> <span class="nav-text">编译结果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

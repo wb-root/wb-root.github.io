@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Android 多Dex方案。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MultiDex">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Dex与类加载/MultiDex/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="Android 多Dex方案。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T04:42:35.901Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MultiDex">
+<meta name="twitter:description" content="Android 多Dex方案。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Dex与类加载/MultiDex/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MultiDex | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Dex与类加载/MultiDex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MultiDex
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 12:42:35" itemprop="dateModified" datetime="2018-07-02T12:42:35+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">Android 多Dex方案。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><h3 id="65536-的方法数限制"><a href="#65536-的方法数限制" class="headerlink" title="65536 的方法数限制"></a>65536 的方法数限制</h3><p>Android 官方在<a href="https://developer.android.com/studio/build/multidex" target="_blank" rel="noopener">Multidex</a> 方案中提到，在单个Dex 字节码文件中，能被代码调用的方法数量不能超过65536 个。</p>
+<blockquote>
+<p>65536 represents the total number of references that can be invoked by the code within a single Dalvik Executable (DEX) bytecode file.</p>
+</blockquote>
+<h4 id="Dex-文件中不能存储超过65536个方法？"><a href="#Dex-文件中不能存储超过65536个方法？" class="headerlink" title="Dex 文件中不能存储超过65536个方法？"></a>Dex 文件中不能存储超过65536个方法？</h4><p>在Dex 文件的格式规范中，有两个数据信息与存储的方法相关：</p>
+<ol>
+<li>4个字节表示的 <code>method_id_size</code>，远大于65536.</li>
+<li><p>用于描述方法的数据结构，<code>method_id_item</code>，并没有限制方法数不能超过65536 。</p>
+<p> <strong>method_id_item</strong></p>
+<p> | Name      | Format | Description                              |<br> | ——— | —— | —————————————- |<br> | class_idx | ushort | index into the <code>type_ids</code> list for the definer of this method. This must be a class or array type, and not a primitive type. |<br> | proto_idx | ushort | index into the <code>proto_ids</code> list for the prototype of this method |<br> | name_idx  | uint   | index into the <code>string_ids</code> list for the name of this method. The string must conform to the syntax for <em>MemberName</em>, defined above. |</p>
+<p> 相对应的，在Dalvik virtual machine 的源码中，<a href="https://android.googlesource.com/platform/dalvik/+/android-4.4.2_r2/libdex/DexFile.h" target="_blank" rel="noopener">DexFile.h</a> 中的类和结构体等，存储了Dex 文件被虚拟机加载解析后的数据。其中，用于描述方法的结构体<code>DexMethodId</code>如下。</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DexMethodId</span> &#123;</span></span><br><span class="line">    u2  classIdx;           <span class="comment">/* index into typeIds list for defining class */</span></span><br><span class="line">    u2  protoIdx;           <span class="comment">/* index into protoIds for method prototype */</span></span><br><span class="line">    u4  nameIdx;            <span class="comment">/* index into stringIds for method name */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>据此，我们可以看出，无论是Dex 文件规范，还是虚拟机的实现中，都没有限制一个Dex 文件中可以声明的方法数不能超过65536。</p>
+<h4 id="能被调用的方法无法超过65536个"><a href="#能被调用的方法无法超过65536个" class="headerlink" title="能被调用的方法无法超过65536个"></a>能被调用的方法无法超过65536个</h4><p>65536 的方法数限制，实际上是来自于指令集中调用方法的指令格式的定义。调用方法的指令中，仅用16位来存储要调用的方法的引用（指代在method_ids section 中第几个方法）。也就是说尽管method_ids section 中可以存储的方法数远远多于65536，但是能被调用的却只有65536个。这也解释了为什么65536 是<strong>被引用的方法数</strong>的上限，而不是App 声明的方法数的上限。即，App 中对Android 框架代码的调用，也会被计入。</p>
+<blockquote>
+<p>invoke-<em>kind</em> {vC, vD, vE, vF, vG}, meth@BBBB </p>
+<p><code>B:</code> method reference index (16 bits) </p>
+</blockquote>
+<p>这也是构建工具报“65536”错误的根本原因，原因不在于构建工具，而在于指令集。否则Google 只需要发布新的构建工具即可。</p>
+<h4 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h4><p>Google 为何不推行新的指令集来解决此问题？个人认为应该是为了兼容老版本的系统。推出新的指令集，意味着构建的Dex 文件中的指令格式与以往不同，从而无法被老版本的系统识别。</p>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p><a href="https://stackoverflow.com/questions/21490382/does-the-android-art-runtime-have-the-same-method-limit-limitations-as-dalvik" target="_blank" rel="noopener">Does the Android ART runtime have the same method limit limitations as Dalvik?</a></p>
+<h3 id="LinearAlloc-exceeded"><a href="#LinearAlloc-exceeded" class="headerlink" title="LinearAlloc exceeded"></a>LinearAlloc exceeded</h3><p><a href="https://www.facebook.com/notes/facebook-engineering/under-the-hood-dalvik-patch-for-facebook-for-android/10151345597798920" target="_blank" rel="noopener">Facebook hack</a> 和 <a href="https://developer.android.com/studio/build/multidex#limitations" target="_blank" rel="noopener">Android 官网</a> 中，都提到了一个问题，名为<code>LinearAlloc</code>的<code>buffer</code> 溢出而引起崩溃。<code>LinearAlloc</code>缓存了app 中的方法的信息，它在安装和运行app的时候都会发挥作用。</p>
+<h4 id="安装app"><a href="#安装app" class="headerlink" title="安装app"></a>安装app</h4><p>安装的时候，“dexopt” 这个程序在预处理dex 文件的时候会使用<code>LinearAlloc</code>来索引Dex 文件中的所有方法。通过拆分Dex，可以避免此问题。</p>
+<blockquote>
+<p><a href="http://code.google.com/p/android/issues/detail?id=22586" target="_blank" rel="noopener">http://code.google.com/p/android/issues/detail?id=22586</a></p>
+<p>During standard <strong>installation</strong>, a program called “dexopt” runs to prepare your app for the specific phone it’s being installed on. Dexopt uses a fixed-size buffer (called the “LinearAlloc” buffer) to store information about all of the methods in your app. Recent versions of Android use an 8 or 16 MB buffer, but Froyo and Gingerbread (versions 2.2 and 2.3) only have 5 MB. Because older versions of Android have a relatively small buffer, our large number of methods was exceeding the buffer size and causing dexopt to crash.</p>
+</blockquote>
+<blockquote>
+<p>When running on versions prior to Android 5.0 (API level 21), using multidex is not enough to work around the linearalloc limit (<a href="http://b.android.com/78035" target="_blank" rel="noopener">issue 78035</a>). This limit was increased in Android 4.0 (API level 14), but that did not solve it completely. And on versions lower than Android 4.0, you might reach the linearalloc limit before reaching the DEX index limit. </p>
+</blockquote>
+<h4 id="运行app"><a href="#运行app" class="headerlink" title="运行app"></a>运行app</h4><p>运行的时候，app 会使用<code>LinearAlloc</code>来索引方法。由于Facebook 在拆分Dex 之后，运行时将子Dex 注入到<code>ClassLoader</code>中，使得运行时的方法数并没能减少，因此再次遇上了此问题。其通过 JNI 来替换<code>buffer</code>，增大其空间，以此来解决问题。</p>
+<blockquote>
+<p>The LinearAlloc buffer doesn’t just exist in dexopt–it exists within every <strong>running</strong> Android program. While dexopt uses LinearAlloc to to store information about all of the methods in your dex file, the running app only needs it for methods in classes that you are actually using.</p>
+<p>Looking at the definition of the LinearAlloc buffer (<a href="https://github.com/android/platform_dalvik/blob/android-2.3.7_r1/vm/LinearAlloc.h#L33" target="_blank" rel="noopener">https://github.com/android/platform_dalvik/blob/android-2.3.7_r1/vm/LinearAlloc.h#L33</a>), we realized that if we could only increase that buffer from 5 MB to 8 MB, we would be safe! </p>
+<p>That’s when we had the idea of using a JNI extension to replace the existing buffer with a larger one.</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>无论是构建时的65536 问题，还是 LinearAlloc exceeded 问题，都将矛头指向了方法数，特别是单个Dex 中的方法数过多的问题。一个可行的解决方案是，在构建的时候将代码拆分到多个Dex。值得一提的是，拆分后所有Dex 的方法数之和<strong>不等于</strong>原先一个Dex 的方法数。</p>
+<h1 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h1><h2 id="构建多Dex"><a href="#构建多Dex" class="headerlink" title="构建多Dex"></a>构建多Dex</h2><h3 id="Ant-构建"><a href="#Ant-构建" class="headerlink" title="Ant 构建"></a>Ant 构建</h3><p><a href="https://android-developers.googleblog.com/2011/07/custom-class-loading-in-dalvik.html" target="_blank" rel="noopener">Custom Class Loading in Dalvik</a></p>
+<h3 id="Gradle-构建"><a href="#Gradle-构建" class="headerlink" title="Gradle 构建"></a>Gradle 构建</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ...</span><br><span class="line">        minSdkVersion <span class="number">21</span> </span><br><span class="line">        targetSdkVersion <span class="number">26</span></span><br><span class="line">        multiDexEnabled <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Now when you build your app, the Android build tools construct a primary DEX file (<code>classes.dex</code>) and supporting DEX files (<code>classes2.dex</code>, <code>classes3.dex</code>, and so on) as needed. The build system then packages all DEX files into your APK. </p>
+</blockquote>
+<h2 id="运行多Dex"><a href="#运行多Dex" class="headerlink" title="运行多Dex"></a>运行多Dex</h2><p>ART本身支持从apk文件中加载多个Dex。ART在app安装时，会进行预处理（Ahead of time compilation），即扫描apk包中所有的Dex文件，进行编译并生成一个oat执行文件。因此ART在运行时只需加载一个oat文件，无需处理加载多Dex 的问题。相对应的，由于运行Dalvik 的系统（5.0以下系统）默认只加载一个Dex（以下简称<strong>主Dex</strong>），开发者需要处理加载运行其他Dex（以下简称<strong>子Dex</strong>） 的问题。</p>
+<h3 id="DexClassLoader"><a href="#DexClassLoader" class="headerlink" title="DexClassLoader"></a>DexClassLoader</h3><p>在 <a href="https://android-developers.googleblog.com/2011/07/custom-class-loading-in-dalvik.html" target="_blank" rel="noopener">Custom Class Loading in Dalvik</a> 中提到的方案，主要包含以下内容：</p>
+<ol>
+<li>在app 代码设计上，划分模块。</li>
+<li>将不同的模块编入不同的Dex。</li>
+<li>模块之间通过接口关联调用。</li>
+<li>运行时使用<code>DexClassLoader</code>动态加载子Dex，反射创建子Dex 中的业务对象，并强转为约定的接口进行调用。</li>
+</ol>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p>此方案适合模块之间较为独立的项目，其缺点是约束性较强，模块之间仅能通过接口或者反射进行调用，并且随着接口的增多，Dex 中的方法数也相应地增多。</p>
+<h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>将多个模块共用的基础业务或工具划分到主Dex，利用<code>ClassLoader</code>的父类委托机制，将主Dex 的<code>ClassLoader</code>作为子Dex 的<code>ClassLoader</code>的父亲。通过这种方式，子模块可直接调用主Dex 中的类，无需反射调用以及借助接口。</p>
+<h3 id="Hook-DexPathList"><a href="#Hook-DexPathList" class="headerlink" title="Hook DexPathList"></a>Hook <code>DexPathList</code></h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">  compile <span class="string">'com.android.support:multidex:1.0.3'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原理是<code>BaseDexClassLoader</code>允许加载多个apk、jar或者dex文件，并从中加载类。需要使用反射来实现。</p>
+<h2 id="遇到过的问题"><a href="#遇到过的问题" class="headerlink" title="遇到过的问题"></a>遇到过的问题</h2><h3 id="加载Dex-是耗时操作"><a href="#加载Dex-是耗时操作" class="headerlink" title="加载Dex 是耗时操作"></a>加载Dex 是耗时操作</h3><p>需要在划分Dex 的时候按业务模块划分，加载的时候，运用多线程、提前加载等，再结合交互上的进度圈等，优化体验。在<a href="https://tech.meituan.com/mt-android-auto-split-dex.html" target="_blank" rel="noopener">美团的方案</a>中也提到了，通过Hook Instrumentation 的方式来避免多线程加载时的同步问题。</p>
+<h3 id="按需加载Dex"><a href="#按需加载Dex" class="headerlink" title="按需加载Dex"></a>按需加载Dex</h3><p>曾经想要做到按需加载Dex，也就是在需要加载一个类的时候，才去加载这个类所在的Dex。最好的方法自然是使用自定义的类加载器。</p>
+<p>一开始企图使用反射，直接将<code>ContextImpl</code>里的<code>mClassLoader</code>替换为自定义的类加载器，但是由于<strong>初始加载器机制</strong>，使得自定义类加载器并未发挥作用。于是，改变策略，通过反射将自定义类加载器设置为系统类加载器的父亲，以此来获得优先加载权。</p>
+<p>但是又碰到另一个问题：<a href="https://stackoverflow.com/questions/32519420/moving-classes-to-multidex-in-existing-apk" target="_blank" rel="noopener">Dalvik 提前解析依赖类</a>。在Dalvik 上，加载类的时候，会进行优化和验证，此过程会解析类的依赖（但是不会马上加载，在真正执行的时候才会加载）。如果一个类A引用了子Dex 中的类B，在加载类A的时候，如果此时还未加载子Dex，可观察到如下log。即使在真正执行到与依赖的类相关的语句之前加载子Dex，仍然会报<code>NoClassDefFoundError</code>。根据log可猜测，类A在加载的时候，与类B相关的某些指令被替换修改了。这对按需加载的打击是毁灭性的。ART 上则不存在此问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">E/dalvikvm: Could not find class &apos;com.example.dex.lib.Test&apos;, referenced from method com.example.dex.App.attachBaseContext</span><br><span class="line">W/dalvikvm: VFY: unable to resolve new-instance 28 (Lcom/example/dex/lib/Test;) in Lcom/example/dex/App;</span><br><span class="line">D/dalvikvm: VFY: replacing opcode 0x22 at 0x0039</span><br><span class="line">D/dalvikvm: DexOpt: unable to opt direct call 0x003e at 0x3b in Lcom/example/dex/App;.attachBaseContext</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>There’s a thing called <a href="https://android.googlesource.com/platform/dalvik/+/master/docs/verifier.html" target="_blank" rel="noopener">Dalvik verifier</a> that has complex rules for determining inappropriate bytecode. For example, before loading the Application class, VM verifier performs its checks and if it finds a field whose type it can’t resolve (yet), it will not allow to run instruction that accessing this field, even if at that point of time we already patched the ClassLoader and the class could be resolved. </p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/View/View树的绘制/" rel="next" title="View树的绘制">
+                <i class="fa fa-chevron-left"></i> View树的绘制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Dex与类加载/类加载机制/" rel="prev" title="类加载">
+                类加载 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.1.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#65536-的方法数限制"><span class="nav-number">1.1.1.</span> <span class="nav-text">65536 的方法数限制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dex-文件中不能存储超过65536个方法？"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">Dex 文件中不能存储超过65536个方法？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#能被调用的方法无法超过65536个"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">能被调用的方法无法超过65536个</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#思考"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">思考</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">参考</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinearAlloc-exceeded"><span class="nav-number">1.1.2.</span> <span class="nav-text">LinearAlloc exceeded</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装app"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">安装app</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行app"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">运行app</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案"><span class="nav-number">2.</span> <span class="nav-text">方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#构建多Dex"><span class="nav-number">2.1.</span> <span class="nav-text">构建多Dex</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ant-构建"><span class="nav-number">2.1.1.</span> <span class="nav-text">Ant 构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradle-构建"><span class="nav-number">2.1.2.</span> <span class="nav-text">Gradle 构建</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行多Dex"><span class="nav-number">2.2.</span> <span class="nav-text">运行多Dex</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DexClassLoader"><span class="nav-number">2.2.1.</span> <span class="nav-text">DexClassLoader</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改进"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">改进</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hook-DexPathList"><span class="nav-number">2.2.2.</span> <span class="nav-text">Hook DexPathList</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到过的问题"><span class="nav-number">2.3.</span> <span class="nav-text">遇到过的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加载Dex-是耗时操作"><span class="nav-number">2.3.1.</span> <span class="nav-text">加载Dex 是耗时操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按需加载Dex"><span class="nav-number">2.3.2.</span> <span class="nav-text">按需加载Dex</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

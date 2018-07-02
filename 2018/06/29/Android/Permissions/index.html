@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="关于Android中的权限的一些要点摘录和总结。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Permission">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Permissions/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="关于Android中的权限的一些要点摘录和总结。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-02T08:14:25.407Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Permission">
+<meta name="twitter:description" content="关于Android中的权限的一些要点摘录和总结。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Permissions/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android Permission | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Permissions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Permission
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 16:14:25" itemprop="dateModified" datetime="2018-07-02T16:14:25+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">关于Android中的权限的一些要点摘录和总结。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Permissions"><a href="#Permissions" class="headerlink" title="Permissions"></a>Permissions</h2><h3 id="Requesting-permission"><a href="#Requesting-permission" class="headerlink" title="Requesting permission"></a>Requesting permission</h3><ul>
+<li><p>清单文件中声明</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.android.app.myapp"</span> &gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.RECEIVE_SMS"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://developer.android.com/training/permissions/requesting.html" target="_blank" rel="noopener">动态申请</a></p>
+<blockquote>
+<p>注意：</p>
+<ol>
+<li><p>动态授权的时候尽管用户是授权给整个permission group，但是只有所申请的权限会被授予，如果需要使用该permission group中的其他权限，仍然需要再次申请（但是系统不会再次要求用户授权，而是马上回调授权的回调方法<code>onRequestPermissionsResult()</code>）。</p>
+</li>
+<li><p>permission group可能随着系统版本不同而不同，所以申请授权时不应该依赖permission group中的其他权限。</p>
+</li>
+<li><p>在授权框上，用户可选择禁止app再次请求该权限，在这种情况下，此后app再调用<code>requestPermissions()</code> ，系统不会弹框要求用户授权，而是马上回调授权的回调方法<code>onRequestPermissionsResult()</code>来通知授权被拒绝。</p>
+</li>
+<li><p>You can also use the adb -g option to grant all permissions automatically when installing an app on an emulator or test device:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;    $ adb shell install -g MyApp.apk</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+</li>
+<li><p>There are a couple of permissions that don’t behave like normal and dangerous permissions. <a href="https://developer.android.com/reference/android/Manifest.permission.html#SYSTEM_ALERT_WINDOW" target="_blank" rel="noopener">SYSTEM_ALERT_WINDOW</a> and <a href="https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS" target="_blank" rel="noopener">WRITE_SETTINGS</a> are particularly sensitive, so most apps should not use them. If an app needs one of these permissions, it must declare the permission in the manifest, <em>and</em> <strong>send an intent</strong> requesting the user’s authorization. The system responds to the intent by showing a detailed management screen to the user.</p>
+<p>For details on how to request these permissions, see the <code>SYSTEM_ALERT_WINDOW</code> and <code>WRITE_SETTINGS</code> reference entries.</p>
+</li>
+</ul>
+<h3 id="Permission"><a href="#Permission" class="headerlink" title="Permission"></a>Permission</h3><h4 id="Permission-attributes"><a href="#Permission-attributes" class="headerlink" title="Permission attributes"></a>Permission attributes</h4><ul>
+<li><p>System permissions are divided into several <a href="https://developer.android.com/guide/topics/manifest/permission-element.html#plevel" target="_blank" rel="noopener"><strong>protection levels</strong></a>. The two most important protection levels to know about are <a href="https://developer.android.com/guide/topics/permissions/normal-permissions.html" target="_blank" rel="noopener">normal</a> and dangerous permissions.</p>
+<blockquote>
+<p>个人注解：</p>
+<p><code>normal</code>权限其实就是安装app时列出来的权限要求。</p>
+<p><code>dangerous</code>权限从6.0开始需要动态授权。</p>
+<p>另外有传言，在Google play 或者app 安装页面，<code>normal</code>权限可能被折叠（如果权限比较多的话），<code>dangerous</code>则不会。</p>
+</blockquote>
+</li>
+<li><p>Any permission can belong to a <a href="https://developer.android.com/reference/android/Manifest.permission_group.html" target="_blank" rel="noopener"><strong>permission group</strong></a>. </p>
+<blockquote>
+<p>个人注解：</p>
+<p>6.0及以上系统，当app对某个permission发起授权请求，系统以permission group为单位，向用户提供授权选项。并且当下次对同一个group中的其他permission发起授权请求时，系统自动授予权限。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="Define-custom-permissions"><a href="#Define-custom-permissions" class="headerlink" title="Define custom permissions"></a><a href="https://developer.android.com/guide/topics/permissions/defining.html#defining" target="_blank" rel="noopener">Define custom permissions</a></h4><ol>
+<li>定义权限</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.example.myapp"</span> &gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">permission</span> <span class="attr">android:name</span>=<span class="string">"com.example.myapp.permission.DEADLY_ACTIVITY"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">"@string/permlab_deadlyActivity"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:description</span>=<span class="string">"@string/permdesc_deadlyActivity"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:permissionGroup</span>=<span class="string">"android.permission-group.COST_MONEY"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:protectionLevel</span>=<span class="string">"dangerous"</span> /&gt;</span></span><br><span class="line">    ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>由于四大组件是app的入口，app的自定义权限是通过限制四大组件的调用来起保护作用的。</p>
+<p>通过在四大组件的声明标签中添加<code>android:permission</code>属性可以声明调用该组件所需要的权限。（动态注册和发送广播时也可以声明必须的权限）（<code>ContentProvider</code>通过<code>android:readPermission</code>和<code>android:writePermission</code>分别控制读写权限）</p>
+</li>
+</ol>
+<h4 id="uid及其权限作用"><a href="#uid及其权限作用" class="headerlink" title="uid及其权限作用"></a><a href="https://developer.android.com/guide/topics/permissions/defining.html#userid" target="_blank" rel="noopener">uid及其权限作用</a></h4><ul>
+<li><p>通过在<code>manifest</code>标签中声明<code>sharedUserId</code>属性，并指定相同的属性值，拥有<strong>相同签名</strong>的多个app在同一台设备上，会被分配相同的uid，从而app可以相互访问私有文件，以及在同一进程中运行。系统不允许<strong>uid</strong>不同的apk定义同名权限，定义已经存在的权限的apk会安装失败。  </p>
+</li>
+<li><p>如果只想在拥有相同签名的app间共享机能，可以不用定义权限，而是直接进行签名检查。</p>
+<blockquote>
+<p>If the functionality is only available to apps signed with the same signature as the providing app, you may be able to avoid defining custom permissions by using signature checks. When one of your apps makes a request of another of your apps, the second app can verify that both apps are signed with the same certificate before complying with the request. <strong>But how to verify ???</strong></p>
+</blockquote>
+</li>
+</ul>
+<h4 id="URI-Permissions"><a href="#URI-Permissions" class="headerlink" title="URI Permissions"></a><a href="https://developer.android.com/guide/topics/permissions/overview.html#uri" target="_blank" rel="noopener">URI Permissions</a></h4><h3 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h3><ul>
+<li><p>Often times a permission failure will result in a <code>SecurityException</code> being thrown back to the app. However, this is not guaranteed to occur everywhere. For example, the <code>sendBroadcast(Intent)</code> method checks permissions as data is being delivered to each receiver, after the method call has returned, so you will not receive an exception if there are permission failures. In almost all cases, however, a permission failure will be printed to the system log.</p>
+</li>
+<li><p>A particular permission may be enforced at a number of places during your program’s operation:</p>
+<ol>
+<li>At the time of a call into the system, to prevent an app from executing certain functions.</li>
+<li>When starting an <strong>activity</strong>, to prevent apps from launching activities of other apps.</li>
+<li>Both sending and receiving <strong>broadcasts</strong>, to control who can receive your broadcast or who can send a broadcast to you.</li>
+<li>When accessing and operating on a <strong>content provider</strong>.</li>
+<li>Binding to or starting a <strong>service</strong>.</li>
+</ol>
+</li>
+<li><p>Over time, <strong>new restrictions</strong> may be added to the platform such that, in order to use certain APIs, your app must request a permission that it previously did not need. Android may apply the new permission request to the app’s manifest. Android makes the decision as to whether an app might need the permission based on the value provided for the <code>targetSdkVersion</code> attribute. If the value is lower than the version in which the permission was added, then Android adds the permission.  </p>
+<blockquote>
+<p><strong>Caution:</strong> If a permission is automatically added to your app, your app listing on Google Play lists these additional permissions even though your app might not actually require them.<br>To avoid this and remove the default permissions you don’t need, always update your targetSdkVersion to be as high as possible. You can see which permissions were added with each release in the <a href="https://developer.android.com/reference/android/os/Build.VERSION_CODES.html" target="_blank" rel="noopener">Build.VERSION_CODES</a> documentation</p>
+</blockquote>
+</li>
+<li><p>If an <strong>app update</strong> includes the need for <strong>additional permissions</strong>， the user is prompted to accept those new permissions before updating the app.</p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><strong>获取权限</strong>的结果由以下维度共同决定：<ol>
+<li>权限的 protection level（是否需要动态授权）</li>
+<li>权限的 permission group（以权限组为单位进行授权）</li>
+<li>App的 targetSdkVersion（是否被自动补充权限声明以及是否需要动态授权等）</li>
+<li>App的uid（拥有相同<strong>signature</strong>的不同app可通过声明<code>sharedUserId</code>属性共享uid，从而有权互搞）</li>
+</ol>
+</li>
+<li><strong>权限保护</strong>由以下维度共同决定：<ol>
+<li>四大组件在AndroidManifest.xml文件中声明时，通过标签属性或子元素，声明要求的权限。</li>
+<li>URI Permission</li>
+<li>动态检查权限其他App是否有某个权限<ul>
+<li><a href="https://developer.android.com/reference/android/content/Context.html#checkCallingPermission(java.lang.String" target="_blank" rel="noopener">Context.checkCallingPermission()</a>)</li>
+<li><a href="https://developer.android.com/reference/android/content/Context.html#checkUriPermission(android.net.Uri, int, int, int" target="_blank" rel="noopener"> Context.checkUriPermission()</a>)</li>
+<li><a href="https://developer.android.com/reference/android/content/pm/PackageManager.html#checkPermission(java.lang.String, java.lang.String" target="_blank" rel="noopener">PackageManager.checkPermission()</a>)</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/Service/" rel="next" title="Service">
+                <i class="fa fa-chevron-left"></i> Service
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Handler消息处理机制/" rel="prev" title="Handler消息处理机制">
+                Handler消息处理机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Permissions"><span class="nav-number">1.</span> <span class="nav-text">Permissions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Requesting-permission"><span class="nav-number">1.1.</span> <span class="nav-text">Requesting permission</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Permission"><span class="nav-number">1.2.</span> <span class="nav-text">Permission</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Permission-attributes"><span class="nav-number">1.2.1.</span> <span class="nav-text">Permission attributes</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Define-custom-permissions"><span class="nav-number">1.2.2.</span> <span class="nav-text">Define custom permissions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#uid及其权限作用"><span class="nav-number">1.2.3.</span> <span class="nav-text">uid及其权限作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#URI-Permissions"><span class="nav-number">1.2.4.</span> <span class="nav-text">URI Permissions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Others"><span class="nav-number">1.3.</span> <span class="nav-text">Others</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

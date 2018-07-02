@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Dex文件结构与运行时。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dex文件">
+<meta property="og:url" content="http://yoursite.com/2018/06/29/Android/Dex与类加载/Dex文件/index.html">
+<meta property="og:site_name" content="WB&#39;s Root">
+<meta property="og:description" content="Dex文件结构与运行时。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/Jar%20&%20Apk%20%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84.png">
+<meta property="og:updated_time" content="2018-07-02T07:34:39.396Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dex文件">
+<meta name="twitter:description" content="Dex文件结构与运行时。">
+<meta name="twitter:image" content="http://pb88ntxoi.bkt.clouddn.com/image/android/Jar%20&%20Apk%20%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/29/Android/Dex与类加载/Dex文件/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Dex文件 | WB's Root</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">WB's Root</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/29/Android/Dex与类加载/Dex文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WB">
+      <meta itemprop="description" content="在开发的路上摸爬滚打">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WB's Root">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dex文件
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2018-06-29T00:00:00+08:00">2018-06-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-02 15:34:39" itemprop="dateModified" datetime="2018-07-02T15:34:39+08:00">2018-07-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">Dex文件结构与运行时。</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Dex"><a href="#Dex" class="headerlink" title="Dex"></a>Dex</h2><p>Dex (dalvik executables) 文件是二进制文件，而非文本文件，是编译java 代码的结果。</p>
+<blockquote>
+<p>Android runtime (ART) is the managed runtime used by applications and some system services on Android. ART and its predecessor Dalvik were originally created specifically for the Android project. ART as the runtime executes the Dalvik Executable format and Dex bytecode specification. </p>
+</blockquote>
+<p>Dex 文件类似一个数据包，由 header 等多个数据段拼接而成。</p>
+<h3 id="Dex文件的结构"><a href="#Dex文件的结构" class="headerlink" title="Dex文件的结构"></a>Dex文件的结构</h3><p>在Dex 文件中，<strong>data（数据区）</strong>不是以类为单位来存储代码，而是分为字符串区域、filed区域、method区域等，所有的数据被分块存储，不同的区块之间通过引用来指明关系。</p>
+<p>举例：method区域中一个方法的记录中，有着不同的字段，记录着方法名等。这些字段并非直接存储着这些数据，而是存储着这些数据在Dex 文件中位置的“指针”。比如方法名字段，实际上是一个代表着方法名字符串在字符串区域位置的数字。例如方法名字段为0x5，意味着方法名是字符串区域中的第五个字符串。</p>
+<p>值得一提的是，字符串区域，不仅仅存储着代码中的字符串常量，也存储着类名、方法名等字符串。</p>
+<p><img src="http://pb88ntxoi.bkt.clouddn.com/image/android/Jar%20&amp;%20Apk%20%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84.png" alt="Jar &amp; Apk 文件结构"></p>
+<table>
+<thead>
+<tr>
+<th>数据名称</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>header</td>
+<td>dex文件头部，记录整个dex文件的相关属性</td>
+</tr>
+<tr>
+<td>string_ids</td>
+<td>字符串数据索引，记录了每个字符串在数据区的偏移量</td>
+</tr>
+<tr>
+<td>type_ids</td>
+<td>类似数据索引，记录了每个类型的字符串索引</td>
+</tr>
+<tr>
+<td>proto_ids</td>
+<td>原型数据索引，记录了方法声明的字符串，返回类型字符串，参数列表</td>
+</tr>
+<tr>
+<td>field_ids</td>
+<td>字段数据索引，记录了所属类，类型以及方法名</td>
+</tr>
+<tr>
+<td>method_ids</td>
+<td>类方法索引，记录方法所属类名，方法声明以及方法名等信息</td>
+</tr>
+<tr>
+<td>class_defs</td>
+<td>类定义数据索引，记录指定类各类信息，包括接口，超类，类数据偏移量</td>
+</tr>
+<tr>
+<td>data</td>
+<td>数据区，存储代码的真实数据</td>
+</tr>
+<tr>
+<td>link_data</td>
+<td>连接数据区</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Header"><a href="#Header" class="headerlink" title="Header"></a>Header</h3><table>
+<thead>
+<tr>
+<th>字段名称</th>
+<th>偏移值</th>
+<th>长度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>magic</td>
+<td>0x0</td>
+<td>8</td>
+<td>魔数字段，值为”dex\n035\0”</td>
+</tr>
+<tr>
+<td>checksum</td>
+<td>0x8</td>
+<td>4</td>
+<td>校验码</td>
+</tr>
+<tr>
+<td>signature</td>
+<td>0xc</td>
+<td>20</td>
+<td>sha-1签名</td>
+</tr>
+<tr>
+<td>file_size</td>
+<td>0x20</td>
+<td>4</td>
+<td>dex文件总长度</td>
+</tr>
+<tr>
+<td>header_size</td>
+<td>0x24</td>
+<td>4</td>
+<td>文件头长度，009版本=0x5c,035版本=0x70</td>
+</tr>
+<tr>
+<td>endian_tag</td>
+<td>0x28</td>
+<td>4</td>
+<td>标示字节顺序的常量</td>
+</tr>
+<tr>
+<td>link_size</td>
+<td>0x2c</td>
+<td>4</td>
+<td>链接段的大小，如果为0就是静态链接</td>
+</tr>
+<tr>
+<td>link_off</td>
+<td>0x30</td>
+<td>4</td>
+<td>链接段的开始位置</td>
+</tr>
+<tr>
+<td>map_off</td>
+<td>0x34</td>
+<td>4</td>
+<td>map数据基址</td>
+</tr>
+<tr>
+<td>string_ids_size</td>
+<td>0x38</td>
+<td>4</td>
+<td>字符串列表中字符串个数</td>
+</tr>
+<tr>
+<td>string_ids_off</td>
+<td>0x3c</td>
+<td>4</td>
+<td>字符串列表基址</td>
+</tr>
+<tr>
+<td>type_ids_size</td>
+<td>0x40</td>
+<td>4</td>
+<td>类列表里的类型个数</td>
+</tr>
+<tr>
+<td>type_ids_off</td>
+<td>0x44</td>
+<td>4</td>
+<td>类列表基址</td>
+</tr>
+<tr>
+<td>proto_ids_size</td>
+<td>0x48</td>
+<td>4</td>
+<td>原型列表里面的原型个数</td>
+</tr>
+<tr>
+<td>proto_ids_off</td>
+<td>0x4c</td>
+<td>4</td>
+<td>原型列表基址</td>
+</tr>
+<tr>
+<td>field_ids_size</td>
+<td>0x50</td>
+<td>4</td>
+<td>字段个数</td>
+</tr>
+<tr>
+<td>field_ids_off</td>
+<td>0x54</td>
+<td>4</td>
+<td>字段列表基址</td>
+</tr>
+<tr>
+<td>method_ids_size</td>
+<td>0x58</td>
+<td>4</td>
+<td>方法个数</td>
+</tr>
+<tr>
+<td>method_ids_off</td>
+<td>0x5c</td>
+<td>4</td>
+<td>方法列表基址</td>
+</tr>
+<tr>
+<td>class_defs_size</td>
+<td>0x60</td>
+<td>4</td>
+<td>类定义标中类的个数</td>
+</tr>
+<tr>
+<td>class_defs_off</td>
+<td>0x64</td>
+<td>4</td>
+<td>类定义列表基址</td>
+</tr>
+<tr>
+<td>data_size</td>
+<td>0x68</td>
+<td>4</td>
+<td>数据段的大小，必须4k对齐</td>
+</tr>
+<tr>
+<td>data_off</td>
+<td>0x6c</td>
+<td>4</td>
+<td>数据段基址</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Smali"><a href="#Smali" class="headerlink" title="Smali"></a>Smali</h2><p>Dex 文件作为二进制文件，可读性和可编辑性很差。dex2Jar 等工具，可以将Dex 文件反编成Jar 文件甚至解析成java 文件。值得注意的是，Dex 文件内容与Java 代码不能完全对应，即Dex 文件中的代码是以指令为基本单位，而Java 代码作为高级语言，往往一个语句可编译成多个指令，因此在反汇编过程中会有改动或信息丢失。</p>
+<p>Smali 类似汇编语言，是根据Dex 文件字节码格式，将可读性差的二进制数据解析成可读性更强的指令。将Dex 文件转成Smali 文件的过程称为baksmali ，反过来称为smali。因此Smali 可以指代一种语言、文件格式或者将Smali 文件转成Dex 文件的过程。</p>
+<p>从上面Dex 文件的结构可以看出，Dex 文件中实际上是将不同类型的数据分块存储。在代码区域，存储着函数方法的实现，即编译后的指令。根据Android 对指令集的定义，我们可以解析指令。</p>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/30837450/what-is-smali-code-android" target="_blank" rel="noopener">What is Smali Code Android</a></p>
+<p><a href="https://www.quora.com/What-is-smali-in-Android" target="_blank" rel="noopener">What is smali in Android? </a></p>
+</blockquote>
+<h2 id="指令集"><a href="#指令集" class="headerlink" title="指令集"></a>指令集</h2><p>Dex 文件中的代码区，包含了方法中的指令。</p>
+<p>每条指令包含一个<strong>指令码（Op）</strong>，可在<a href="https://source.android.com/devices/tech/dalvik/dalvik-bytecode#instructions" target="_blank" rel="noopener">此处</a>查询对应的Op 及其含义，可以理解为不同的指令码对应着不同的操作，如调用方法、赋值等。</p>
+<p>不同指令的指令格式可能不同，比如，调用方法（可能）需要指明调用对象、方法名、参数等，而赋值需要指明赋值对象和值。因此每个指令码对应有一个指令格式，通过<strong>指令格式标识</strong>来指明。指令格式标识大多由三个字符组成，前两个是数字，最后一个是字母。在<a href="https://source.android.com/devices/tech/dalvik/instruction-formats#formats" target="_blank" rel="noopener">此处</a>可查询不同的指令格式。</p>
+<ol>
+<li>第一个数字是表示指令有多少个16位的字组成。</li>
+<li>第二个数字是表示指令最多使用寄存器的个数。特殊标记“r”标识使用一定范围内的寄存器。</li>
+<li>第三个字母为类型码，表示指令用到的额外数据的类型 。</li>
+</ol>
+<blockquote>
+<p><a href="https://www.cnblogs.com/dacainiao/p/6035298.html" target="_blank" rel="noopener">Dalvik指令格式</a></p>
+<p><a href="https://www.cnblogs.com/dacainiao/p/6036834.html" target="_blank" rel="noopener">指令解析</a> </p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://blog.csdn.net/dd864140130/article/details/52076515" target="_blank" rel="noopener">Dalvik字节码指令及Smali文件</a></li>
+<li><a href="https://www.jianshu.com/p/f7f0a712ddfe" target="_blank" rel="noopener">Dex文件格式详解</a></li>
+</ul>
+<h2 id="odex-And-oat"><a href="#odex-And-oat" class="headerlink" title="odex And oat"></a>odex And oat</h2><p>Android 系统在安装app 的时候，会提取dex 文件进行<strong>预处理</strong>，并将处理结果写入 \data\dalvik-cache\ 目录下，运行app 时加载处理过的文件。不同系统的预处理行为有所不同，生成的文件类型也不同，但目标文件名仍然以“.dex”作为后缀。</p>
+<h3 id="5-0-之前的系统"><a href="#5-0-之前的系统" class="headerlink" title="5.0 之前的系统"></a>5.0 之前的系统</h3><p>预处理行为是对dex 文件进行<strong>优化</strong>，生成的文件仍然是字节码文件，文件格式称为odex 或dey。</p>
+<p>虚拟机Dalvik 中包含一个解释器，在运行app 时，加载odex 文件并将指令<strong>逐条解释</strong>成机器码执行。从Android 2.2开始，还引入了<strong>JIT（Just-In-Time）</strong>，在运行时，会识别使用频率高的<strong>代码块</strong>，先编译成本地机器码再执行，以提高效率。顾名思义，JIT 是每次运行时都需要重新进行的操作。</p>
+<h3 id="5-0-及以上系统"><a href="#5-0-及以上系统" class="headerlink" title="5.0 及以上系统"></a>5.0 及以上系统</h3><p>预处理行为是将dex 进行<strong>编译</strong>，将字节码编译成本地机器码，文件格式称为oat 或elf。运行时，ART 加载oat 文件，由于存储的是机器码，无需解释执行字节码指令，从而提高了效率。</p>
+<h3 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h3><p><a href="https://blog.csdn.net/Luoshengyang/article/details/18006645" target="_blank" rel="noopener">Android ART运行时无缝替换Dalvik虚拟机的过程分析</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/29/Android/Android 资源/资源编译/" rel="next" title="Android 资源编译">
+                <i class="fa fa-chevron-left"></i> Android 资源编译
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Android/Android 资源/Resources杂记/" rel="prev" title="Android Resources 杂记">
+                Android Resources 杂记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="WB" />
+            
+              <p class="site-author-name" itemprop="name">WB</p>
+              <p class="site-description motion-element" itemprop="description">在开发的路上摸爬滚打</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dex"><span class="nav-number">1.</span> <span class="nav-text">Dex</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Dex文件的结构"><span class="nav-number">1.1.</span> <span class="nav-text">Dex文件的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Header"><span class="nav-number">1.2.</span> <span class="nav-text">Header</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Smali"><span class="nav-number">2.</span> <span class="nav-text">Smali</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指令集"><span class="nav-number">3.</span> <span class="nav-text">指令集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#odex-And-oat"><span class="nav-number">5.</span> <span class="nav-text">odex And oat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-0-之前的系统"><span class="nav-number">5.1.</span> <span class="nav-text">5.0 之前的系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-0-及以上系统"><span class="nav-number">5.2.</span> <span class="nav-text">5.0 及以上系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考-1"><span class="nav-number">5.3.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WB</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
